@@ -29,6 +29,14 @@
 	<meta name="robots" content="index, follow" />
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 	<link rel="apple-touch-icon" href="/logo.png" />
+	<link rel="preload" href="/fonts/hello-note.otf" as="font" type="font/otf" crossorigin="anonymous" />
+	<link
+		rel="preload"
+		href="/fonts/architects-daughter-latin.woff2"
+		as="font"
+		type="font/woff2"
+		crossorigin="anonymous"
+	/>
 	<meta property="og:image" content="{site.url}/logo.png" />
 	<meta property="og:image:alt" content={site.name} />
 </svelte:head>

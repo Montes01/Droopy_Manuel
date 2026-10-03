@@ -69,8 +69,8 @@
 		top: 0;
 		z-index: 1000;
 		isolation: isolate;
-		background: light-dark(#ffffff, #111111);
-		border-bottom: 1px solid light-dark(#e5e5e5, #2a2a2a);
+		background: #ffffff;
+		border-bottom: 1px solid #e5e5e5;
 		padding-top: env(safe-area-inset-top);
 	}
 
@@ -110,7 +110,7 @@
 		justify-content: center;
 		min-width: var(--tap-min);
 		background: none;
-		border: 1px solid light-dark(#d4d4d4, #3a3a3a);
+		border: 1px solid #d4d4d4;
 		border-radius: 0.625rem;
 		cursor: pointer;
 		color: inherit;
@@ -150,7 +150,7 @@
 		inset-inline: 0;
 		top: 100%;
 		z-index: 1000;
-		background: light-dark(#ffffff, #111111);
+		background: #ffffff;
 		display: grid;
 		grid-template-rows: 0fr;
 		visibility: hidden;
@@ -162,7 +162,7 @@
 	.nav.open {
 		grid-template-rows: 1fr;
 		visibility: visible;
-		border-bottom: 1px solid light-dark(#e5e5e5, #2a2a2a);
+		border-bottom: 1px solid #e5e5e5;
 		box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 0.12);
 	}
 
@@ -194,16 +194,17 @@
 		border-radius: 0.625rem;
 		color: inherit;
 		text-decoration: none;
-		font-weight: 500;
+		font-family: var(--font-brand);
+		font-size: 1.25rem;
+		font-weight: 400;
 	}
 
 	.nav a:hover {
-		background: light-dark(#f2f2f2, #222222);
+		background: #f2f2f2;
 	}
 
 	.nav a.active {
-		font-weight: 700;
-		background: light-dark(#ebebeb, #262626);
+		background: #ebebeb;
 	}
 
 	@media (min-width: 48rem) {

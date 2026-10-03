@@ -37,6 +37,7 @@
 		type="font/woff2"
 		crossorigin="anonymous"
 	/>
+	<link rel="preload" href="/main-bg.jpg" as="image" type="image/jpeg" fetchpriority="high" />
 	<meta property="og:image" content="{site.url}/logo.png" />
 	<meta property="og:image:alt" content={site.name} />
 </svelte:head>

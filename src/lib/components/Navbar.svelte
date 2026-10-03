@@ -21,7 +21,7 @@
 
 <svelte:window onkeydown={onkeydown} />
 
-<header class="topbar">
+<header class="topbar glass">
 	<div class="container topbar-inner">
 		<a href="/" class="brand" aria-label="Fundación Droopy Manuel — inicio" onclick={close}>
 			<img src="/logo.png" alt="" width="64" height="40" class="brand-mark" fetchpriority="high" />
@@ -43,7 +43,7 @@
 			</span>
 		</button>
 
-		<nav id="primary-nav" class="nav" class:open aria-label="Navegación principal">
+		<nav id="primary-nav" class="nav glass" class:open aria-label="Navegación principal">
 			<ul>
 				{#each nav as item (item.href)}
 					{@const active = pathname === item.href}
@@ -69,8 +69,7 @@
 		top: 0;
 		z-index: 1000;
 		isolation: isolate;
-		background: #ffffff;
-		border-bottom: 1px solid #e5e5e5;
+		border-bottom: 1px solid rgb(0 0 0 / 0.08);
 		padding-top: env(safe-area-inset-top);
 	}
 
@@ -150,7 +149,6 @@
 		inset-inline: 0;
 		top: 100%;
 		z-index: 1000;
-		background: #ffffff;
 		display: grid;
 		grid-template-rows: 0fr;
 		visibility: hidden;
@@ -162,7 +160,7 @@
 	.nav.open {
 		grid-template-rows: 1fr;
 		visibility: visible;
-		border-bottom: 1px solid #e5e5e5;
+		border-bottom: 1px solid rgb(0 0 0 / 0.08);
 		box-shadow: 0 0.75rem 1.5rem rgb(0 0 0 / 0.12);
 	}
 
@@ -220,6 +218,9 @@
 			display: block;
 			position: static;
 			visibility: visible;
+			background: transparent;
+			-webkit-backdrop-filter: none;
+			backdrop-filter: none;
 			border-bottom: 0;
 			box-shadow: none;
 			transition: none;

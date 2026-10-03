@@ -11,6 +11,14 @@ export const site = {
 	twitterHandle: '@droopymanuel'
 } as const;
 
+export const nav = [
+	{ label: '🏠 Inicio', href: '/' },
+	{ label: '🐶 Conócenos', href: '/conocenos' },
+	{ label: '🐾 Perritos', href: '/perritos' },
+	{ label: '⭐ Dona Estrellas', href: '/dona-estrellas' },
+	{ label: '📖 Historias', href: '/historias' }
+] as const;
+
 export function pageTitle(page?: string): string {
 	if (!page) return site.title;
 	return `${page} | ${site.name}`;

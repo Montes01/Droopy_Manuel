@@ -1,4 +1,6 @@
 <script lang="ts">
+	import '../app.css';
+	import Navbar from '#lib/components/Navbar.svelte';
 	import { site } from '#lib/site';
 
 	let { children } = $props();
@@ -26,6 +28,10 @@
 
 	<meta name="robots" content="index, follow" />
 	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+	<link rel="apple-touch-icon" href="/logo.png" />
+	<meta property="og:image" content="{site.url}/logo.png" />
+	<meta property="og:image:alt" content={site.name} />
 </svelte:head>
 
+<Navbar />
 {@render children()}

@@ -73,5 +73,44 @@ export const testimonials: Testimonial[] = [
 	}
 ];
 
+export interface Achievement {
+	title: string;
+	date: string;
+	excerpt: string;
+	/** Ruta en /static cuando haya foto real. Null = holder ilustrado. */
+	image: string | null;
+}
+
+export const achievementsNews: Achievement[] = [
+	{
+		title: 'Jornada masiva de esterilización',
+		date: '2026-09-12',
+		excerpt:
+			'Esterilizamos a 40 perritos comunitarios en un solo fin de semana junto a dos clínicas aliadas. Cero camadas callejeras nacen de la prevención.',
+		image: null
+	},
+	{
+		title: 'Luna encontró a su familia',
+		date: '2026-08-28',
+		excerpt:
+			'Después de 9 meses con nosotros, Luna se fue a casa con los Fernández. Lloramos, reímos y le preparamos su mochila de despedida.',
+		image: null
+	},
+	{
+		title: 'Nuevo techo para la manada',
+		date: '2026-07-15',
+		excerpt:
+			'Gracias a las Estrellas Arcoíris inauguramos 6 casitas nuevas con techo térmico. Los días de lluvia ya no nos preocupan.',
+		image: null
+	},
+	{
+		title: 'Max, perro de terapia certificado',
+		date: '2026-05-30',
+		excerpt:
+			'Max aprobó su certificación y ya visita hospitales cada semana. Del abandono a sanar corazones: orgullo total de la manada.',
+		image: null
+	}
+];
+
 export const aboutBlurb =
 	'Somos una fundación dedicada al rescate, rehabilitación y adopción de perritos. Cada estrella que donas se convierte en croquetas, vacunas y segundas oportunidades.';

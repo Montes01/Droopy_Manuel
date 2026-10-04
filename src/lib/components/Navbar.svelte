@@ -251,6 +251,21 @@
 
 		.nav a {
 			padding-inline: 0.875rem;
+			color: #fffdf8;
+			text-shadow:
+				-1px -1px 0 #7a3f16,
+				1px -1px 0 #7a3f16,
+				-1px 1px 0 #7a3f16,
+				1px 1px 0 #7a3f16,
+				0 3px 10px rgb(122 63 22 / 0.6);
+		}
+
+		.nav a:hover {
+			background: rgb(122 63 22 / 0.12);
+		}
+
+		.nav a.active {
+			background: rgb(122 63 22 / 0.2);
 		}
 	}
 </style>

@@ -22,7 +22,7 @@
 <svelte:window onkeydown={onkeydown} />
 
 <header class="topbar glass">
-	<div class="container topbar-inner">
+	<div class="topbar-inner">
 		<a href="/" class="brand" aria-label="Fundación Droopy Manuel — inicio" onclick={close}>
 			<img src="/logo.png" alt="" width="64" height="40" class="brand-mark" fetchpriority="high" />
 			<img src="/titulo.png" alt="Fundación Droopy Manuel" width="220" height="36" class="brand-title" fetchpriority="high" />
@@ -78,6 +78,9 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 1rem;
+		width: 100%;
+		margin: 0;
+		padding-inline: var(--container-pad);
 		min-height: 3.75rem;
 	}
 
@@ -101,6 +104,12 @@
 	.brand-title {
 		height: 1.5rem;
 		width: auto;
+	}
+
+	@media (max-width: 22.4375rem) {
+		.brand-title {
+			display: none;
+		}
 	}
 
 	.menu-button {
@@ -209,7 +218,9 @@
 		.brand-title {
 			height: 1.75rem;
 		}
+	}
 
+	@media (min-width: 84rem) {
 		.menu-button {
 			display: none;
 		}

@@ -21,7 +21,7 @@
 
 <svelte:window onkeydown={onkeydown} />
 
-<header class="topbar glass">
+<header class="topbar">
 	<div class="topbar-inner">
 		<a href="/" class="brand" aria-label="Fundación Droopy Manuel — inicio" onclick={close}>
 			<img src="/logo.png" alt="" width="64" height="40" class="brand-mark" fetchpriority="high" />
@@ -69,6 +69,7 @@
 		top: 0;
 		z-index: 1000;
 		isolation: isolate;
+		background: #ffffff;
 		border-bottom: 1px solid rgb(0 0 0 / 0.08);
 		padding-top: env(safe-area-inset-top);
 	}

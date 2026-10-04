@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { site, pageTitle, socials } from '#lib/site';
-	import { achievementsNews } from '#lib/data/content';
+	import { news } from '#lib/data/content';
 
 	const title = pageTitle('Home');
 </script>
@@ -74,10 +74,10 @@
 			</a>
 		</div>
 	</section>
-	<section class="achievements" aria-labelledby="achievements-title">
-		<p class="cards-title" id="achievements-title">🏆 Nuestros logros 🏆</p>
-		<div class="achievements-grid">
-			{#each achievementsNews as item}
+	<section class="news" aria-labelledby="news-title">
+		<p class="cards-title" id="news-title">📰 Noticias 📰</p>
+		<div class="news-grid">
+			{#each news as item}
 				<article class="news-card glass">
 					<div class="news-holder" aria-hidden="true">
 						{#if item.image}
@@ -100,6 +100,7 @@
 				</article>
 			{/each}
 		</div>
+		<a class="see-all" href="/noticias">Ver todas →</a>
 	</section>
 	<section class="contact" aria-labelledby="contact-title">
 		<p class="cards-title" id="contact-title">📬 Contáctanos 📬</p>
@@ -161,7 +162,7 @@
 		border-radius: 1.25rem;
 		border: 4px solid rgb(128 128 128 / 0.7);
 		outline: 1px solid rgb(0 0 0 / 0.1);
-		margin-block: 1rem 2rem;
+		margin-block: 1.5rem 3rem;
 		margin-inline: auto;
 		max-width: 510px;
 		min-height: 32rem;
@@ -248,18 +249,41 @@
 	}
 
 	.help {
-		margin-block: 2.5rem 2rem;
+		margin-block: 3rem;
 	}
 
 	.help-title {
 		margin-top: 0;
 	}
 
-	.achievements {
-		margin-block: 1rem 2.5rem;
+	.see-all {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: var(--tap-min);
+		margin-top: 1.5rem;
+		padding: 0.625rem 1.75rem;
+		border-radius: 999px;
+		background: #7a3f16;
+		color: #fff8ef;
+		font-family: var(--font-brand);
+		font-size: 1.375rem;
+		text-decoration: none;
+		transition: transform 0.25s ease;
 	}
 
-	.achievements-grid {
+	.news {
+		margin-block: 3rem;
+		text-align: center;
+	}
+
+	@media (hover: hover) {
+		.see-all:hover {
+			transform: translateY(-0.25rem);
+		}
+	}
+
+	.news-grid {
 		display: grid;
 		grid-template-columns: 1fr;
 		gap: 1.25rem;
@@ -292,6 +316,7 @@
 
 	.news-body {
 		padding: 1.25rem;
+		text-align: left;
 	}
 
 	.news-body h3 {
@@ -310,7 +335,7 @@
 	}
 
 	.contact {
-		margin-block: 1rem 2.5rem;
+		margin-block: 3rem 4rem;
 	}
 
 	.contact-grid {
@@ -366,11 +391,11 @@
 			height: 2.25rem;
 		}
 
-		.achievements .cards-title {
+		.news .cards-title {
 			display: block;
 		}
 
-		.achievements-grid {
+		.news-grid {
 			grid-template-columns: repeat(2, 1fr);
 			gap: 1.5rem;
 		}
@@ -395,7 +420,7 @@
 			grid-template-columns: 2fr 1fr;
 			gap: 1.5rem;
 			align-items: stretch;
-			margin-block: 1rem 2rem;
+			margin-block: 1.5rem 3rem;
 		}
 
 		.hero {

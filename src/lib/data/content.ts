@@ -73,7 +73,7 @@ export const testimonials: Testimonial[] = [
 	}
 ];
 
-export interface Achievement {
+export interface NewsItem {
 	title: string;
 	date: string;
 	excerpt: string;
@@ -81,7 +81,7 @@ export interface Achievement {
 	image: string | null;
 }
 
-export const achievementsNews: Achievement[] = [
+export const news: NewsItem[] = [
 	{
 		title: 'Jornada masiva de esterilización',
 		date: '2026-09-12',

@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { site, pageTitle, socials } from '#lib/site';
+	import HomeCard from '#lib/components/HomeCard.svelte';
+	import { site, pageTitle } from '#lib/site';
 	import { news } from '#lib/data/content';
 
 	const title = pageTitle('Home');
@@ -33,45 +34,37 @@
 
 	<p class="cards-title">✨ Nuestra historia y nuestra manada ✨</p>
 	<section aria-label="Proyecto destacado">
-		<a class="photo-card" href="/project" aria-label="Soy Droopy Manuel — ver proyecto">
-			<img
-				src="/cards/soy-droopy.png"
-				alt="Soy Droopy Manuel"
-				loading="lazy"
-				decoding="async"
-			/>
-		</a>
+		<HomeCard
+			href="/project"
+			src="/cards/soy-droopy.png"
+			alt="Soy Droopy Manuel"
+			label="Soy Droopy Manuel — ver proyecto"
+		/>
 	</section>
 	<section aria-label="Manada comunitaria">
-		<a class="photo-card" href="/manada" aria-label="Manada Comunitaria — ver manada">
-			<img
-				src="/cards/manada-comunitaria.jpg"
-				alt="Manada Comunitaria"
-				loading="lazy"
-				decoding="async"
-			/>
-		</a>
+		<HomeCard
+			href="/manada"
+			src="/cards/manada-comunitaria.jpg"
+			alt="Manada Comunitaria"
+			label="Manada Comunitaria — ver manada"
+		/>
 	</section>
 	</div>
 	<section class="help" aria-labelledby="help-title">
 		<p class="cards-title help-title" id="help-title">🐾 ¿Cómo puedes ayudar? ⭐</p>
 		<div class="help-grid">
-			<a class="photo-card" href="/dona-estrellas" aria-label="Donar Estrellas — donar">
-				<img
-					src="/cards/dona-estrellas.jpg"
-					alt="Donar Estrellas"
-					loading="lazy"
-					decoding="async"
-				/>
-			</a>
-			<a class="photo-card" href="/tienda" aria-label="Visitar Tienda Solidaria — ver tienda">
-				<img
-					src="/cards/tienda-solidaria.jpg"
-					alt="Visitar Tienda Solidaria"
-					loading="lazy"
-					decoding="async"
-				/>
-			</a>
+			<HomeCard
+				href="/dona-estrellas"
+				src="/cards/dona-estrellas.jpg"
+				alt="Donar Estrellas"
+				label="Donar Estrellas — donar"
+			/>
+			<HomeCard
+				href="/tienda"
+				src="/cards/tienda-solidaria.jpg"
+				alt="Visitar Tienda Solidaria"
+				label="Visitar Tienda Solidaria — ver tienda"
+			/>
 		</div>
 	</section>
 	<section class="news" aria-labelledby="news-title">
@@ -101,23 +94,6 @@
 			{/each}
 		</div>
 		<a class="see-all" href="/noticias">Ver todas →</a>
-	</section>
-	<section class="contact" aria-labelledby="contact-title">
-		<p class="cards-title" id="contact-title">📬 Contáctanos 📬</p>
-		<div class="contact-grid">
-			{#each socials as item}
-				<a
-					class="contact-btn glass"
-					href={item.href}
-					target="_blank"
-					rel="noopener noreferrer"
-					aria-label={`${site.name} en ${item.label}`}
-					title={item.label}
-				>
-					<img src={item.icon} alt="" width="28" height="28" loading="lazy" decoding="async" />
-				</a>
-			{/each}
-		</div>
 	</section>
 </main>
 
@@ -201,41 +177,6 @@
 			-2px 2px 0 #7a3f16,
 			2px 2px 0 #7a3f16,
 			0 6px 20px rgb(122 63 22 / 0.6);
-	}
-
-	.photo-card {
-		display: block;
-		overflow: clip;
-		border-radius: 1.25rem;
-		border: 4px solid rgb(128 128 128 / 0.7);
-		outline: 1px solid rgb(0 0 0 / 0.1);
-		margin: 0 0 1.5rem;
-		max-width: none;
-		box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 0.15);
-		transition:
-			transform 0.25s ease,
-			box-shadow 0.25s ease;
-	}
-
-	.photo-card img {
-		width: 100%;
-		height: auto;
-		transition: transform 0.3s ease;
-	}
-
-	@media (hover: hover) {
-		.photo-card:hover {
-			transform: translateY(-0.25rem);
-			box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 0.22);
-		}
-
-		.photo-card:hover img {
-			transform: scale(1.03);
-		}
-
-		.photo-card:active {
-			transform: translateY(0);
-		}
 	}
 
 	@media (min-width: 48rem) {
@@ -334,63 +275,7 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.contact {
-		margin-block: 3rem 4rem;
-	}
-
-	.contact-grid {
-		display: grid;
-		grid-template-columns: repeat(5, 1fr);
-		gap: 0.75rem;
-		justify-items: center;
-	}
-
-	.contact-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 3.5rem;
-		height: 3.5rem;
-		border-radius: 50%;
-		border: 1px solid rgb(255 255 255 / 0.6);
-		color: inherit;
-		text-decoration: none;
-		transition: transform 0.25s ease;
-	}
-
-	.contact-btn img {
-		width: 1.75rem;
-		height: 1.75rem;
-		object-fit: contain;
-	}
-
-	@media (hover: hover) {
-		.contact-btn:hover {
-			transform: translateY(-0.25rem);
-		}
-	}
-
 	@media (min-width: 64rem) {
-		.contact .cards-title {
-			display: block;
-		}
-
-		.contact-grid {
-			grid-template-columns: repeat(5, auto);
-			justify-content: center;
-			gap: 1.25rem;
-		}
-
-		.contact-btn {
-			width: 4.5rem;
-			height: 4.5rem;
-		}
-
-		.contact-btn img {
-			width: 2.25rem;
-			height: 2.25rem;
-		}
-
 		.news .cards-title {
 			display: block;
 		}
@@ -428,12 +313,6 @@
 			max-width: none;
 			min-height: 100%;
 			grid-row: span 2;
-		}
-
-		.photo-card {
-			margin: 0;
-			max-width: none;
-			align-self: center;
 		}
 	}
 </style>

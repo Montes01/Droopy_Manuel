@@ -12,11 +12,11 @@ export const site = {
 } as const;
 
 export const nav = [
-	{ label: '🏠 Inicio', href: '/' },
-	{ label: '🐶 Conócenos', href: '/conocenos' },
-	{ label: '🐾 Perritos', href: '/perritos' },
-	{ label: '⭐ Dona Estrellas', href: '/dona-estrellas' },
-	{ label: '📖 Historias', href: '/historias' }
+	{ label: '🏠 Home', href: '/' },
+	{ label: '🐾 Mi manada comunitaria', href: '/manada' },
+	{ label: '⭐ Dona estrellas', href: '/dona-estrellas' },
+	{ label: '🛍️ Tienda Solidaria', href: '/tienda' },
+	{ label: '📰 Noticias', href: '/noticias' }
 ] as const;
 
 export function pageTitle(page?: string): string {

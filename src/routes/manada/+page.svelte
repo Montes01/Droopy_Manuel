@@ -1,19 +1,14 @@
 <script lang="ts">
 	import DogCard from '#lib/components/DogCard.svelte';
 	import DogModal from '#lib/components/DogModal.svelte';
-	import { getDog } from '#lib/data/dogs';
+	import { alivePackSlugs, heavenPackSlugs, packFromSlugs } from '#lib/data/dogs';
 	import type { Dog } from '#lib/data/types';
 	import { site, pageTitle } from '#lib/site';
 
 	const title = pageTitle('Mi manada comunitaria');
 
-	const alivePack = ['toby', 'luna', 'thor', 'chiquis']
-		.map((slug) => getDog(slug))
-		.filter((dog) => dog !== undefined);
-
-	const heavenPack = ['manuel', 'duque']
-		.map((slug) => getDog(slug))
-		.filter((dog) => dog !== undefined);
+	const alivePack = packFromSlugs(alivePackSlugs);
+	const heavenPack = packFromSlugs(heavenPackSlugs);
 
 	let view: 'alive' | 'heaven' = $state('alive');
 

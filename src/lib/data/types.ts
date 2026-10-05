@@ -23,6 +23,25 @@ export interface Dog {
 	featured?: boolean;
 }
 
+/** Medio por el que se puede pagar: define la etiqueta del badge. */
+export type PaymentMethod = 'transferencia' | 'billetera' | 'internacional';
+
+/** Un dato de la cuenta. Solo `copyable` ofrece botón de copiar. */
+export interface AccountField {
+	label: string;
+	value: string;
+	copyable?: boolean;
+}
+
+export interface BankAccount {
+	bank: string;
+	emoji: string;
+	method: PaymentMethod;
+	holder: string;
+	/** El campo con `copyable` es el que la persona transcribe al transferir. */
+	fields: AccountField[];
+}
+
 export interface DonationTier {
 	stars: number;
 	name: string;

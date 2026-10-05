@@ -282,6 +282,22 @@ export function getDog(slug: string) {
 	return dogs.find((dog) => dog.slug === slug);
 }
 
+/**
+ * Slugs de la manada que se muestra en /manada, divididos en manada viva y
+ * manada en el cielo. Es la única fuente de verdad: la usan /manada y
+ * /dona-estrellas para no mantener dos listas distintas.
+ */
+export const alivePackSlugs = ['toby', 'luna', 'thor', 'chiquis'] as const;
+
+export const heavenPackSlugs = ['manuel', 'duque'] as const;
+
+/** Resuelve slugs a perritos, descartando los que no existan en `dogs`. */
+export function packFromSlugs(slugs: readonly string[]) {
+	return slugs
+		.map((slug) => getDog(slug))
+		.filter((dog): dog is Dog => dog !== undefined);
+}
+
 export function dogsByStatus(status: Dog['status']) {
 	return dogs.filter((dog) => dog.status === status);
 }

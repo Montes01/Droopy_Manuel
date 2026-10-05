@@ -1,0 +1,7 @@
+{
+  "model": "deepseek/deepseek-v4.1-flash",
+  "context_limit": 64000,
+  "OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX": 4000,
+  "auto_compact_threshold": 0.65,
+  "system_prompt_prefix": "Be extremely concise. Write code, do not explain it unless asked. Never repeat context."
+}

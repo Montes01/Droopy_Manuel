@@ -62,6 +62,13 @@
 		</button>
 	</div>
 
+	<section class="thanks" aria-labelledby="thanks-title">
+		<h2 class="thanks-title" id="thanks-title">💛 Gracias por sumar amor</h2>
+		<p class="thanks-foot">
+			Cada estrella se convierte en comida, vacunas y un hogar para la manada.
+		</p>
+	</section>
+
 	<StarModal
 		{open}
 		dogs={donationTargets}
@@ -172,6 +179,38 @@
 			outline: 3px solid #7a3f16;
 			outline-offset: 2px;
 		}
+	}
+
+	/* --- Gracias --- */
+
+	.thanks {
+		margin-top: 2.5rem;
+	}
+
+	.thanks-title {
+		font-family: var(--font-brand);
+		font-weight: 400;
+		color: #fffdf8;
+		text-align: center;
+		text-wrap: balance;
+		font-size: clamp(1.375rem, 5vw, 1.875rem);
+		line-height: 1.2;
+		text-shadow:
+			-2px -2px 0 #7a3f16,
+			2px -2px 0 #7a3f16,
+			-2px 2px 0 #7a3f16,
+			2px 2px 0 #7a3f16,
+			0 6px 20px rgb(122 63 22 / 0.6);
+	}
+
+	.thanks-foot {
+		margin-top: 0.5rem;
+		text-align: center;
+		text-wrap: pretty;
+		font-size: 0.9375rem;
+		max-width: 36rem;
+		margin-inline: auto;
+		opacity: 0.85;
 	}
 
 	@media (min-width: 48rem) {

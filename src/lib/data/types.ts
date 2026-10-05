@@ -64,3 +64,63 @@ export interface SiteStats {
 	sterilized: number;
 	inCare: number;
 }
+
+/** Slug de una categoría de la tienda. Define la URL /tienda/[categoria]. */
+export type ShopCategorySlug =
+	| 'camisetas'
+	| 'gorras'
+	| 'juguetes'
+	| 'libros'
+	| 'llaveros'
+	| 'mugs';
+
+export interface ShopCategory {
+	slug: ShopCategorySlug;
+	name: string;
+	emoji: string;
+	blurb: string;
+}
+
+export interface Product {
+	/** Único dentro de su categoría. Define ?articulo= en la URL. */
+	slug: string;
+	category: ShopCategorySlug;
+	name: string;
+	price: number;
+	/** COP por defecto. */
+	currency: string;
+	/** Texto corto para la tarjeta. */
+	tagline: string;
+	description: string;
+	/** Ruta en /static cuando haya foto real. Null = avatar con inicial. */
+	photo: string | null;
+	stock: number;
+	sizes?: string[];
+}
+
+/** Una línea del carrito: producto + cantidad + talla elegida. */
+export interface CartLine {
+	slug: string;
+	category: ShopCategorySlug;
+	quantity: number;
+	size?: string;
+}
+
+/** Opción de envío. Define subtotal de envío y total del pedido. */
+export interface ShippingOption {
+	id: string;
+	label: string;
+	detail: string;
+	price: number;
+}
+
+export interface CheckoutForm {
+	firstName: string;
+	lastName: string;
+	country: string;
+	address: string;
+	city: string;
+	phone: string;
+	email: string;
+	notes: string;
+}

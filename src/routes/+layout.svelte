@@ -2,6 +2,7 @@
 	import '../app.css';
 	import Navbar from '#lib/components/Navbar.svelte';
 	import Footer from '#lib/components/Footer.svelte';
+	import FloatingCart from '#lib/components/FloatingCart.svelte';
 	import { site } from '#lib/site';
 
 	let { children } = $props();
@@ -44,5 +45,8 @@
 </svelte:head>
 
 <Navbar />
-{@render children()}
+<div class="page-content">
+	{@render children()}
+</div>
 <Footer />
+<FloatingCart />

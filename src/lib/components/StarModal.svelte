@@ -75,20 +75,16 @@
 			</ul>
 
 			<div class="modal-actions">
-				<a
+				<button
+					type="button"
 					class="confirm-btn"
-					class:disabled={!selected}
-					href={selected ? whatsappHref : undefined}
-					target="_blank"
-					rel="noreferrer"
-					aria-disabled={!selected}
-					tabindex={selected ? undefined : -1}
-					onclick={(event) => {
-						if (!selected) event.preventDefault();
+					disabled={!selected}
+					onclick={() => {
+						if (selected) window.open(whatsappHref, '_blank', 'noopener,noreferrer');
 					}}
 				>
 					Enviar comprobante
-				</a>
+				</button>
 			</div>
 		</div>
 	</div>
@@ -298,11 +294,10 @@
 		text-decoration: none;
 	}
 
-	.confirm-btn.disabled {
+	.confirm-btn:disabled {
 		background: rgb(0 0 0 / 0.12);
 		color: rgb(0 0 0 / 0.4);
 		cursor: not-allowed;
-		pointer-events: auto;
 	}
 
 	@media (hover: hover) {
@@ -310,7 +305,7 @@
 			background: rgb(255 255 255 / 0.95);
 		}
 
-		.confirm-btn:not(.disabled):hover {
+		.confirm-btn:not(:disabled):hover {
 			background: #388e3c;
 		}
 

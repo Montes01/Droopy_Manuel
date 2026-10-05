@@ -28,20 +28,22 @@
 			<img src="/titulo.png" alt="Fundación Droopy Manuel" width="220" height="36" class="brand-title" fetchpriority="high" />
 		</a>
 
-		<button
-			type="button"
-			class="menu-button"
-			aria-expanded={open}
-			aria-controls="primary-nav"
-			aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
-			onclick={toggle}
-		>
-			<span class="menu-icon" aria-hidden="true">
-				<span></span>
-				<span></span>
-				<span></span>
-			</span>
-		</button>
+		<div class="topbar-actions">
+			<button
+				type="button"
+				class="menu-button"
+				aria-expanded={open}
+				aria-controls="primary-nav"
+				aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+				onclick={toggle}
+			>
+				<span class="menu-icon" aria-hidden="true">
+					<span></span>
+					<span></span>
+					<span></span>
+				</span>
+			</button>
+		</div>
 
 		<nav id="primary-nav" class="nav glass" class:open aria-label="Navegación principal">
 			<ul>
@@ -123,6 +125,12 @@
 		border-radius: 0.625rem;
 		cursor: pointer;
 		color: inherit;
+	}
+
+	.topbar-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
 	}
 
 	.menu-icon {

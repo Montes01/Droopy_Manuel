@@ -28,8 +28,8 @@
 	{/if}
 
 	<meta name="robots" content="index, follow" />
-	<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-	<link rel="apple-touch-icon" href="/logo.png" />
+	<link rel="icon" href="/favicon.png" />
+	<link rel="apple-touch-icon" href="/favicon.png" />
 	<link rel="preload" href="/fonts/hello-note.otf" as="font" type="font/otf" crossorigin="anonymous" />
 	<link
 		rel="preload"

@@ -118,6 +118,31 @@ export interface ShopItem {
 	featured?: boolean;
 }
 
+/** Categoría de una noticia. `slug` para filtros, `label` para la UI. */
+export type NewsCategory = 'rescate' | 'adopcion' | 'salud' | 'evento' | 'tienda';
+
+/** Noticia de la fundación. `slug` se usa en la ruta /noticias/[slug]. */
+export interface NewsItem {
+	slug: string;
+	title: string;
+	/** Bajada corta para la tarjeta del feed. */
+	excerpt: string;
+	/** Historia completa en párrafos. */
+	body: string[];
+	/** Fecha ISO (YYYY-MM-DD). Ordena el feed: más reciente primero. */
+	date: string;
+	category: NewsCategory;
+	/** Etiquetas cortas para la tarjeta. */
+	tags: string[];
+	/** Ruta en /static cuando haya foto real. Null = portada ilustrada. */
+	photo: string | null;
+	/** Emoji de respaldo mientras no hay foto real. */
+	emoji: string;
+	/** Slugs de perritos relacionados. */
+	relatedDogSlugs: string[];
+	featured?: boolean;
+}
+
 /** Clave estable de una línea del carrito: producto + variante. */
 export function cartLineKey(slug: string, variantId: string | null): string {
 	return variantId ? `${slug}::${variantId}` : slug;

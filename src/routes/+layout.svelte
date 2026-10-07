@@ -11,8 +11,11 @@
 	// Carrito disponible para todo el árbol de la app (contexto de Svelte).
 	initCart();
 
-	// Las páginas de tienda/carrito/pago van sin footer para no distraer del flujo.
-	let showFooter = $derived(!page.url.pathname.startsWith('/tienda'));
+	// Las páginas de tienda/carrito/pago y de noticias van sin footer:
+	// la tienda para no distraer del flujo, noticias porque es lectura larga.
+	let showFooter = $derived(
+		!page.url.pathname.startsWith('/tienda') && !page.url.pathname.startsWith('/noticias')
+	);
 </script>
 
 <svelte:head>

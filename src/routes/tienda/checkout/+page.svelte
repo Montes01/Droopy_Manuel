@@ -82,6 +82,14 @@
 </svelte:head>
 
 <main class="container checkout-page">
+	<a
+		class="back-btn"
+		href={order || empty ? '/tienda' : '/tienda/carrito'}
+		aria-label="Volver"
+	>
+		<span aria-hidden="true">←</span>
+	</a>
+
 	{#if order}
 		<p class="tagline">💛 ¡Gracias por tu compra! 💛</p>
 		<div class="confirm-layout">
@@ -125,7 +133,6 @@
 
 			<div class="confirm-aside">
 				<TransferInfo />
-				<a class="ghost-btn" href="/tienda">← Seguir comprando</a>
 			</div>
 		</div>
 	{:else if empty}
@@ -266,6 +273,22 @@
 		padding-bottom: 4rem;
 	}
 
+	.back-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--tap-min);
+		height: var(--tap-min);
+		margin-top: 1rem;
+		border-radius: 50%;
+		background: rgb(255 255 255 / 0.85);
+		border: 1px solid rgb(0 0 0 / 0.1);
+		color: #7a3f16;
+		font-size: 1.5rem;
+		line-height: 1;
+		text-decoration: none;
+	}
+
 	.tagline {
 		font-family: var(--font-brand);
 		font-weight: 400;
@@ -386,22 +409,6 @@
 		cursor: progress;
 	}
 
-	.ghost-btn {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-height: var(--tap-min);
-		padding: 0.5rem 1.25rem;
-		border-radius: 999px;
-		border: 2px solid #7a3f16;
-		background: rgb(255 255 255 / 0.85);
-		color: #7a3f16;
-		font-family: var(--font-brand);
-		font-size: 1.125rem;
-		text-decoration: none;
-		cursor: pointer;
-	}
-
 	.checkout-aside,
 	.confirm-aside {
 		display: grid;
@@ -481,12 +488,12 @@
 			background: #388e3c;
 		}
 
-		.ghost-btn:hover {
+		.back-btn:hover {
 			background: #fff8ef;
 		}
 
 		.primary-btn:focus-visible,
-		.ghost-btn:focus-visible {
+		.back-btn:focus-visible {
 			outline: 3px solid #7a3f16;
 			outline-offset: 2px;
 		}

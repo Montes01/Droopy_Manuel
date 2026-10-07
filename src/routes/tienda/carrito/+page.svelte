@@ -17,6 +17,9 @@
 </svelte:head>
 
 <main class="container cart-page">
+	<a class="back-btn" href="/tienda" aria-label="Seguir comprando">
+		<span aria-hidden="true">←</span>
+	</a>
 	<p class="tagline">🛒 Tu carrito 🛒</p>
 
 	{#if cart.lines.length === 0}
@@ -75,7 +78,6 @@
 					{/each}
 				</ul>
 				<div class="cart-actions">
-					<a class="ghost-btn" href="/tienda">← Seguir comprando</a>
 					<button type="button" class="ghost-btn danger" onclick={() => cart.clear()}>
 						Vaciar carrito
 					</button>
@@ -100,6 +102,33 @@
 <style>
 	.cart-page {
 		padding-bottom: 4rem;
+	}
+
+	.back-btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: var(--tap-min);
+		height: var(--tap-min);
+		margin-top: 1rem;
+		border-radius: 50%;
+		background: rgb(255 255 255 / 0.85);
+		border: 1px solid rgb(0 0 0 / 0.1);
+		color: #7a3f16;
+		font-size: 1.5rem;
+		line-height: 1;
+		text-decoration: none;
+	}
+
+	@media (hover: hover) {
+		.back-btn:hover {
+			background: #fff8ef;
+		}
+
+		.back-btn:focus-visible {
+			outline: 3px solid #7a3f16;
+			outline-offset: 2px;
+		}
 	}
 
 	.tagline {

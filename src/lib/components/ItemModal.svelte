@@ -1,27 +1,40 @@
 <script lang="ts">
 	import Icon from '#lib/components/Icon.svelte';
-	import { formatCOP, categoryBySlug } from '#lib/data/shop';
-	import type { ShopItem } from '#lib/data/types';
+	import { categoryBySlug, formatCOP } from '#lib/data/shop';
+	import { unitPriceCents, unitStock } from '#lib/data/types';
+	import type { ShopItem, ShopVariant } from '#lib/data/types';
 
 	interface Props {
 		item: ShopItem | null;
 		onclose: () => void;
-		onadd: (item: ShopItem, quantity: number) => void;
+		onadd: (item: ShopItem, variant: ShopVariant | null, quantity: number) => void;
 	}
 
 	let { item, onclose, onadd }: Props = $props();
 
 	let closing = $state(false);
 	let quantity = $state(1);
+	let variantId = $state<string | null>(null);
 
 	$effect(() => {
 		if (item) {
 			closing = false;
 			quantity = 1;
+			// Primera variante con stock, o null si el producto es simple.
+			variantId = item.variants.find((variant) => variant.stock > 0)?.id ?? item.variants[0]?.id ?? null;
 		}
 	});
 
 	let category = $derived(item ? categoryBySlug(item.category) : undefined);
+	let variant = $derived(item?.variants.find((entry) => entry.id === variantId) ?? null);
+	let stock = $derived(item ? unitStock(item, variant) : 0);
+	let priceCents = $derived(item ? unitPriceCents(item, variant) : 0);
+	let soldOut = $derived(stock <= 0);
+
+	// Si cambia la variante, no dejar la cantidad por encima del stock.
+	$effect(() => {
+		if (quantity > stock && stock > 0) quantity = stock;
+	});
 
 	function requestClose() {
 		if (closing) return;
@@ -30,8 +43,8 @@
 	}
 
 	function add() {
-		if (!item) return;
-		onadd(item, quantity);
+		if (!item || soldOut) return;
+		onadd(item, variant, quantity);
 		requestClose();
 	}
 
@@ -44,7 +57,7 @@
 	}
 
 	function change(delta: number) {
-		quantity = Math.max(1, quantity + delta);
+		quantity = Math.min(stock, Math.max(1, quantity + delta));
 	}
 </script>
 
@@ -69,7 +82,7 @@
 					<p class="modal-category">{category.emoji} {category.name}</p>
 				{/if}
 				<h3>{item.name}</h3>
-				<p class="modal-price">{formatCOP(item.price)}</p>
+				<p class="modal-price">{formatCOP(priceCents)}</p>
 				<p class="modal-desc">{item.description}</p>
 				<p class="modal-details">{item.details}</p>
 
@@ -81,6 +94,44 @@
 					</ul>
 				{/if}
 
+				{#if item.variants.length > 0}
+					<fieldset class="variants">
+						<legend>Elige una opción</legend>
+						<div class="variant-list">
+							{#each item.variants as option (option.id)}
+								<label
+									class="variant"
+									class:selected={variantId === option.id}
+									class:out={option.stock <= 0}
+								>
+									<input
+										type="radio"
+										name="variant"
+										value={option.id}
+										checked={variantId === option.id}
+										disabled={option.stock <= 0}
+										onchange={() => (variantId = option.id)}
+									/>
+									<span>{option.label}</span>
+									{#if option.stock <= 0}
+										<span class="variant-stock">Agotado</span>
+									{:else if option.stock <= 3}
+										<span class="variant-stock">Quedan {option.stock}</span>
+									{/if}
+								</label>
+							{/each}
+						</div>
+					</fieldset>
+				{/if}
+
+				<p class="stock-line">
+					{#if soldOut}
+						Sin stock por ahora 🐾
+					{:else}
+						{stock} disponible{stock === 1 ? '' : 's'}
+					{/if}
+				</p>
+
 				<div class="modal-actions">
 					<div class="qty" role="group" aria-label="Cantidad">
 						<button type="button" onclick={() => change(-1)} aria-label="Quitar una unidad">
@@ -91,9 +142,9 @@
 							<Icon name="plus" size={18} />
 						</button>
 					</div>
-					<button type="button" class="add-btn" onclick={add}>
+					<button type="button" class="add-btn" onclick={add} disabled={soldOut}>
 						<Icon name="cart" size={22} />
-						<span>Agregar</span>
+						<span>{soldOut ? 'Agotado' : 'Agregar'}</span>
 					</button>
 				</div>
 			</div>
@@ -242,7 +293,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.375rem;
-		margin-bottom: 1.25rem;
+		margin-bottom: 1rem;
 	}
 
 	.chips li {
@@ -251,6 +302,67 @@
 		border: 1px solid rgb(0 0 0 / 0.06);
 		padding: 0.125rem 0.625rem;
 		border-radius: 999px;
+	}
+
+	.variants {
+		border: 0;
+		padding: 0;
+		margin: 0 0 0.75rem;
+	}
+
+	.variants legend {
+		font-weight: 700;
+		font-size: 0.9375rem;
+		margin-bottom: 0.5rem;
+		padding: 0;
+	}
+
+	.variant-list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.variant {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.375rem;
+		min-height: var(--tap-min);
+		padding: 0.25rem 0.875rem;
+		border-radius: 999px;
+		border: 2px solid rgb(0 0 0 / 0.12);
+		background: rgb(255 255 255 / 0.8);
+		cursor: pointer;
+		font-size: 0.9375rem;
+	}
+
+	.variant.selected {
+		border-color: #b7791f;
+		background: rgb(255 250 240 / 0.95);
+	}
+
+	.variant.out {
+		opacity: 0.5;
+		cursor: not-allowed;
+		text-decoration: line-through;
+	}
+
+	.variant input {
+		min-height: 0;
+		width: 1rem;
+		height: 1rem;
+		accent-color: #7a3f16;
+	}
+
+	.variant-stock {
+		font-size: 0.75rem;
+		opacity: 0.7;
+	}
+
+	.stock-line {
+		font-size: 0.875rem;
+		opacity: 0.75;
+		margin-bottom: 0.75rem;
 	}
 
 	.modal-actions {
@@ -305,6 +417,12 @@
 		cursor: pointer;
 	}
 
+	.add-btn:disabled {
+		background: rgb(0 0 0 / 0.2);
+		color: rgb(255 255 255 / 0.75);
+		cursor: not-allowed;
+	}
+
 	@media (hover: hover) {
 		.close-btn:hover,
 		.qty button:hover {
@@ -315,13 +433,14 @@
 			background: #ffffff;
 		}
 
-		.add-btn:hover {
+		.add-btn:not(:disabled):hover {
 			background: #b7791f;
 		}
 
 		.close-btn:focus-visible,
 		.qty button:focus-visible,
-		.add-btn:focus-visible {
+		.add-btn:focus-visible,
+		.variant:focus-within {
 			outline: 3px solid #7a3f16;
 			outline-offset: 2px;
 		}

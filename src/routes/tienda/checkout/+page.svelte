@@ -2,23 +2,17 @@
 	import BankAccountCard from '#lib/components/BankAccount.svelte';
 	import OrderRecap from '#lib/components/OrderRecap.svelte';
 	import TransferInfo from '#lib/components/TransferInfo.svelte';
+	import { createOrder } from '#lib/api/shop';
 	import { bankAccounts } from '#lib/data/fundraisers';
+	import { formatCOP } from '#lib/data/shop';
+	import type { OrderCustomer, OrderResult } from '#lib/data/types';
 	import { pageTitle } from '#lib/site';
 	import { useCart } from '#lib/stores/cart.svelte';
 
 	const title = pageTitle('Finalizar compra');
 	const cart = useCart();
 
-	type Form = {
-		nombres: string;
-		apellidos: string;
-		pais: string;
-		direccion: string;
-		ciudad: string;
-		telefono: string;
-		email: string;
-		notas: string;
-	};
+	type Form = OrderCustomer;
 
 	let form = $state<Form>({
 		nombres: '',
@@ -32,12 +26,10 @@
 	});
 
 	let errors = $state<Partial<Record<keyof Form, string>>>({});
-	let submitted = $state(false);
-	let orderNumber = $state('');
-	let confirmedTotal = $state(0);
-	/** Snapshot del pedido al confirmar: el carrito se vacía después. */
-	let confirmedLines = $state<{ name: string; quantity: number; total: number }[]>([]);
-	let confirmedShipping = $state('');
+	let submitting = $state(false);
+	let submitError = $state('');
+	/** Resultado del pedido devuelto por la API. Null = aún no enviado. */
+	let order = $state<OrderResult | null>(null);
 
 	const empty = $derived(cart.lines.length === 0);
 
@@ -56,27 +48,30 @@
 		return Object.keys(next).length === 0;
 	}
 
-	function submit(event: SubmitEvent) {
+	async function submit(event: SubmitEvent) {
 		event.preventDefault();
-		if (!validate() || empty) return;
+		if (submitting || !validate() || empty) return;
 
-		const totals = cart.totals;
-		orderNumber = 'DM-' + Date.now().toString(36).toUpperCase().slice(-6);
-		confirmedTotal = totals.total;
-		confirmedShipping =
-			cart.shipping === 'domicilio' ? 'Envío a domicilio (+$6.000)' : 'Recogida local (gratis)';
-		confirmedLines = cart.lines.map((line) => ({
-			name: line.item.name,
-			quantity: line.quantity,
-			total: line.item.price * line.quantity
-		}));
-		cart.clear();
-		submitted = true;
-		window.scrollTo({ top: 0, behavior: 'smooth' });
-	}
-
-	function formatCOP(value: number): string {
-		return '$' + value.toLocaleString('es-CO');
+		submitting = true;
+		submitError = '';
+		try {
+			const result = await createOrder({
+				customer: { ...form },
+				lines: cart.lines.map((line) => ({
+					slug: line.item.slug,
+					variantId: line.variant?.id ?? null,
+					quantity: line.quantity
+				})),
+				shipping: cart.shipping
+			});
+			order = result;
+			cart.clear();
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		} catch {
+			submitError = 'No pudimos crear tu pedido. Revisa tu conexión e intenta de nuevo.';
+		} finally {
+			submitting = false;
+		}
 	}
 </script>
 
@@ -87,32 +82,36 @@
 </svelte:head>
 
 <main class="container checkout-page">
-	{#if submitted}
+	{#if order}
 		<p class="tagline">💛 ¡Gracias por tu compra! 💛</p>
 		<div class="confirm-layout">
 			<section class="confirm glass" aria-labelledby="confirm-title">
-				<h2 class="section-title" id="confirm-title">Pedido {orderNumber}</h2>
+				<h2 class="section-title" id="confirm-title">Pedido {order.orderNumber}</h2>
 				<p class="confirm-lead">
 					Guarda tu número de pedido: es la referencia para tu transferencia.
 				</p>
 
 				<ul class="confirm-lines">
-					{#each confirmedLines as line}
+					{#each order.lines as line}
 						<li>
 							<span>{line.quantity} × {line.name}</span>
-							<span>{formatCOP(line.total)}</span>
+							<span>{formatCOP(line.totalCents)}</span>
 						</li>
 					{/each}
 				</ul>
 
 				<dl class="confirm-totals">
 					<div>
-						<dt>Entrega</dt>
-						<dd>{confirmedShipping}</dd>
+						<dt>Subtotal</dt>
+						<dd>{formatCOP(order.subtotalCents)}</dd>
+					</div>
+					<div>
+						<dt>Envío ({order.shippingLabel})</dt>
+						<dd>{order.shippingCents === 0 ? 'Gratis' : formatCOP(order.shippingCents)}</dd>
 					</div>
 					<div class="confirm-grand">
 						<dt>Total a transferir</dt>
-						<dd>{formatCOP(confirmedTotal)}</dd>
+						<dd>{formatCOP(order.totalCents)}</dd>
 					</div>
 				</dl>
 
@@ -245,8 +244,12 @@
 					></textarea>
 				</div>
 
-				<button type="submit" class="primary-btn submit-btn">
-					Finalizar compra · {formatCOP(cart.totals.total)}
+				{#if submitError}
+					<p class="submit-error" role="alert">{submitError}</p>
+				{/if}
+
+				<button type="submit" class="primary-btn submit-btn" disabled={submitting}>
+					{submitting ? 'Procesando…' : `Finalizar compra · ${formatCOP(cart.totals.totalCents)}`}
 				</button>
 			</form>
 
@@ -370,6 +373,17 @@
 
 	.submit-btn {
 		margin-top: 0.5rem;
+	}
+
+	.submit-error {
+		color: #c62828;
+		font-weight: 700;
+		font-size: 0.9375rem;
+	}
+
+	.primary-btn:disabled {
+		opacity: 0.6;
+		cursor: progress;
 	}
 
 	.ghost-btn {

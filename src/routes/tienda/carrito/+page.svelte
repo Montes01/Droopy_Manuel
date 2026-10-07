@@ -2,7 +2,8 @@
 	import Icon from '#lib/components/Icon.svelte';
 	import OrderRecap from '#lib/components/OrderRecap.svelte';
 	import { formatCOP } from '#lib/data/shop';
-	import { site, pageTitle } from '#lib/site';
+	import { cartLineKey, unitPriceCents, unitStock } from '#lib/data/types';
+	import { pageTitle } from '#lib/site';
 	import { useCart } from '#lib/stores/cart.svelte';
 
 	const title = pageTitle('Carrito');
@@ -29,17 +30,22 @@
 			<section class="cart-items" aria-labelledby="items-title">
 				<h2 class="section-title" id="items-title">Productos</h2>
 				<ul class="line-list">
-					{#each cart.lines as line (line.item.slug)}
+					{#each cart.lines as line (cartLineKey(line.item.slug, line.variant?.id ?? null))}
+						{@const variantId = line.variant?.id ?? null}
+						{@const unit = unitPriceCents(line.item, line.variant)}
+						{@const max = unitStock(line.item, line.variant)}
 						<li class="cart-line glass">
 							<span class="line-media" aria-hidden="true">{line.item.emoji}</span>
 							<div class="line-body">
-								<a class="line-name" href={`/tienda/${line.item.category}`}>{line.item.name}</a>
-								<span class="line-unit">{formatCOP(line.item.price)} c/u</span>
+								<a class="line-name" href={`/tienda/${line.item.category}`}>
+									{line.item.name}{#if line.variant}<span class="line-variant"> · {line.variant.label}</span>{/if}
+								</a>
+								<span class="line-unit">{formatCOP(unit)} c/u</span>
 								<div class="line-controls">
 									<div class="qty" role="group" aria-label={`Cantidad de ${line.item.name}`}>
 										<button
 											type="button"
-											onclick={() => cart.setQuantity(line.item.slug, line.quantity - 1)}
+											onclick={() => cart.setQuantity(line.item.slug, variantId, line.quantity - 1)}
 											aria-label="Quitar una unidad"
 										>
 											<Icon name="minus" size={16} />
@@ -47,7 +53,8 @@
 										<span aria-live="polite">{line.quantity}</span>
 										<button
 											type="button"
-											onclick={() => cart.setQuantity(line.item.slug, line.quantity + 1)}
+											disabled={line.quantity >= max}
+											onclick={() => cart.setQuantity(line.item.slug, variantId, line.quantity + 1)}
 											aria-label="Añadir una unidad"
 										>
 											<Icon name="plus" size={16} />
@@ -56,14 +63,14 @@
 									<button
 										type="button"
 										class="remove-btn"
-										onclick={() => cart.remove(line.item.slug)}
+										onclick={() => cart.remove(line.item.slug, variantId)}
 										aria-label={`Quitar ${line.item.name} del carrito`}
 									>
 										<Icon name="trash" size={18} />
 									</button>
 								</div>
 							</div>
-							<span class="line-total">{formatCOP(line.item.price * line.quantity)}</span>
+							<span class="line-total">{formatCOP(unit * line.quantity)}</span>
 						</li>
 					{/each}
 				</ul>
@@ -204,6 +211,11 @@
 		text-decoration: none;
 	}
 
+	.line-variant {
+		font-weight: 400;
+		opacity: 0.75;
+	}
+
 	.line-unit {
 		font-size: 0.8125rem;
 		opacity: 0.7;
@@ -242,6 +254,11 @@
 		min-width: 1.75ch;
 		text-align: center;
 		font-weight: 700;
+	}
+
+	.qty button:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
 	}
 
 	.remove-btn {

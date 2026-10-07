@@ -12,6 +12,15 @@
 	}
 
 	let { item, onselect, onadd, inCart = false }: Props = $props();
+
+	/** Stock total: suma de variantes, o el propio del producto. */
+	let stock = $derived(
+		item.variants.length > 0
+			? item.variants.reduce((sum, variant) => sum + variant.stock, 0)
+			: item.stock
+	);
+
+	let soldOut = $derived(stock <= 0);
 </script>
 
 <article class="item-card glass">
@@ -27,10 +36,13 @@
 			{:else}
 				<span class="item-emoji">{item.emoji}</span>
 			{/if}
+			{#if soldOut}
+				<span class="stock-pill">Agotado</span>
+			{/if}
 		</span>
 		<span class="item-info">
 			<span class="item-name">{item.name}</span>
-			<span class="item-price">{formatCOP(item.price)}</span>
+			<span class="item-price">{formatCOP(item.priceCents)}</span>
 		</span>
 	</button>
 
@@ -38,8 +50,13 @@
 		type="button"
 		class="add-btn"
 		class:in-cart={inCart}
+		disabled={soldOut}
 		onclick={() => onadd(item)}
-		aria-label={inCart ? `${item.name} en el carrito, agregar otro` : `Agregar ${item.name} al carrito`}
+		aria-label={soldOut
+			? `${item.name} agotado`
+			: inCart
+				? `${item.name} en el carrito, agregar otro`
+				: `Agregar ${item.name} al carrito`}
 	>
 		<Icon name="cart" size={22} />
 	</button>
@@ -91,6 +108,19 @@
 		filter: drop-shadow(0 6px 12px rgb(0 0 0 / 0.2));
 	}
 
+	.stock-pill {
+		position: absolute;
+		top: 0.625rem;
+		left: 0.625rem;
+		font-size: 0.8125rem;
+		font-weight: 700;
+		padding: 0.25rem 0.75rem;
+		border-radius: 999px;
+		background: #c62828;
+		color: #fffdf8;
+		box-shadow: 0 4px 12px rgb(0 0 0 / 0.25);
+	}
+
 	.item-info {
 		display: grid;
 		gap: 0.25rem;
@@ -134,12 +164,19 @@
 		background: #2e7d32;
 	}
 
+	.add-btn:disabled {
+		background: rgb(0 0 0 / 0.2);
+		color: rgb(255 255 255 / 0.7);
+		cursor: not-allowed;
+		box-shadow: none;
+	}
+
 	@media (hover: hover) {
 		.item-card:hover {
 			transform: translateY(-0.25rem);
 		}
 
-		.add-btn:hover {
+		.add-btn:not(:disabled):hover {
 			transform: scale(1.06);
 		}
 

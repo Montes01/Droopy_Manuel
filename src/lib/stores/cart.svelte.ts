@@ -1,6 +1,7 @@
 import { getContext, setContext } from 'svelte';
-import type { CartLine, CartTotals, ShopItem } from '#lib/data/types';
-import { SHIPPING_COST, type ShippingId } from '#lib/data/shop';
+import { SHIPPING_COST_CENTS, type ShippingId } from '#lib/data/shop';
+import { cartLineKey, unitPriceCents, unitStock } from '#lib/data/types';
+import type { CartLine, CartTotals, ShopItem, ShopVariant } from '#lib/data/types';
 
 const STORAGE_KEY = 'droopy-cart';
 const SHIPPING_KEY = 'droopy-cart-shipping';
@@ -14,7 +15,11 @@ function loadLines(): CartLine[] {
 		if (!Array.isArray(parsed)) return [];
 		return parsed.filter(
 			(line): line is CartLine =>
-				line && typeof line === 'object' && line.item && typeof line.quantity === 'number'
+				line &&
+				typeof line === 'object' &&
+				line.item &&
+				typeof line.quantity === 'number' &&
+				'variant' in line
 		);
 	} catch {
 		return [];
@@ -30,6 +35,9 @@ function loadShipping(): ShippingId {
 /**
  * Carrito reactivo con runes. Se instala una sola vez en el layout y se
  * comparte con el resto del árbol mediante el contexto de Svelte.
+ *
+ * Cada línea se identifica por `cartLineKey(slug, variantId)`: un mismo
+ * producto con variantes distintas son líneas separadas.
  */
 export class CartStore {
 	lines = $state<CartLine[]>(loadLines());
@@ -49,47 +57,70 @@ export class CartStore {
 
 	count = $derived(this.lines.reduce((sum, line) => sum + line.quantity, 0));
 
-	subtotal = $derived(
-		this.lines.reduce((sum, line) => sum + line.item.price * line.quantity, 0)
+	subtotalCents = $derived(
+		this.lines.reduce(
+			(sum, line) => sum + unitPriceCents(line.item, line.variant) * line.quantity,
+			0
+		)
 	);
 
-	shippingCost = $derived(this.shipping === 'domicilio' ? SHIPPING_COST : 0);
+	shippingCents = $derived(this.shipping === 'domicilio' ? SHIPPING_COST_CENTS : 0);
 
 	totals = $derived<CartTotals>({
-		subtotal: this.subtotal,
-		shipping: this.shippingCost,
-		total: this.subtotal + this.shippingCost
+		subtotalCents: this.subtotalCents,
+		shippingCents: this.shippingCents,
+		totalCents: this.subtotalCents + this.shippingCents
 	});
+
+	/** Línea concreta por producto + variante. */
+	lineFor(slug: string, variantId: string | null): CartLine | undefined {
+		const key = cartLineKey(slug, variantId);
+		return this.lines.find((line) => cartLineKey(line.item.slug, line.variant?.id ?? null) === key);
+	}
 
 	has(slug: string): boolean {
 		return this.lines.some((line) => line.item.slug === slug);
 	}
 
-	quantityOf(slug: string): number {
-		return this.lines.find((line) => line.item.slug === slug)?.quantity ?? 0;
+	quantityOf(slug: string, variantId: string | null = null): number {
+		return this.lineFor(slug, variantId)?.quantity ?? 0;
 	}
 
-	add(item: ShopItem, quantity = 1) {
-		const existing = this.lines.find((line) => line.item.slug === item.slug);
+	/** Unidades ya en el carrito para un producto (sumando variantes). */
+	totalQuantityOf(slug: string): number {
+		return this.lines
+			.filter((line) => line.item.slug === slug)
+			.reduce((sum, line) => sum + line.quantity, 0);
+	}
+
+	add(item: ShopItem, variant: ShopVariant | null = null, quantity = 1) {
+		const existing = this.lineFor(item.slug, variant?.id ?? null);
 		if (existing) {
-			existing.quantity += quantity;
+			existing.quantity = Math.min(existing.quantity + quantity, unitStock(item, variant));
 		} else {
-			this.lines.push({ item, quantity });
+			this.lines.push({
+				item,
+				variant,
+				quantity: Math.min(quantity, unitStock(item, variant))
+			});
 		}
 	}
 
-	setQuantity(slug: string, quantity: number) {
-		const line = this.lines.find((entry) => entry.item.slug === slug);
+	setQuantity(slug: string, variantId: string | null, quantity: number) {
+		const line = this.lineFor(slug, variantId);
 		if (!line) return;
 		if (quantity <= 0) {
-			this.remove(slug);
+			this.remove(slug, variantId);
 			return;
 		}
-		line.quantity = quantity;
+		line.quantity = Math.min(quantity, unitStock(line.item, line.variant));
 	}
 
-	remove(slug: string) {
-		this.lines = this.lines.filter((line) => line.item.slug !== slug);
+	remove(slug: string, variantId: string | null = null) {
+		const key = cartLineKey(slug, variantId);
+		this.lines = this.lines.filter(
+			(line) => cartLineKey(line.item.slug, line.variant?.id ?? null) !== key
+		);
 	}
 
 	clear() {

@@ -1,18 +1,20 @@
 <script lang="ts">
 	import ItemCard from '#lib/components/ItemCard.svelte';
 	import ItemModal from '#lib/components/ItemModal.svelte';
-	import { featuredItems, formatCOP, shopCategories, shopItems } from '#lib/data/shop';
-	import type { ShopItem } from '#lib/data/types';
+	import { formatCOP } from '#lib/data/shop';
+	import type { ShopItem, ShopVariant } from '#lib/data/types';
 	import { site, pageTitle } from '#lib/site';
 	import { useCart } from '#lib/stores/cart.svelte';
 
 	const title = pageTitle('Tienda Solidaria');
 	const cart = useCart();
 
+	let { data } = $props();
+
 	let selected: ShopItem | null = $state(null);
 
-	function add(item: ShopItem, quantity = 1) {
-		cart.add(item, quantity);
+	function add(item: ShopItem, variant: ShopVariant | null = null, quantity = 1) {
+		cart.add(item, variant, quantity);
 	}
 </script>
 
@@ -38,8 +40,8 @@
 	<section aria-labelledby="categories-title">
 		<h2 class="section-title" id="categories-title">Categorías</h2>
 		<div class="category-grid">
-			{#each shopCategories as category (category.slug)}
-				{@const count = shopItems.filter((item) => item.category === category.slug).length}
+			{#each data.categories as category (category.slug)}
+				{@const count = data.counts[category.slug] ?? 0}
 				<a class="category-card glass" href={`/tienda/${category.slug}`}>
 					<span class="category-emoji" aria-hidden="true">{category.emoji}</span>
 					<span class="category-body">
@@ -55,7 +57,7 @@
 	<section class="featured" aria-labelledby="featured-title">
 		<h2 class="section-title" id="featured-title">✨ Destacados</h2>
 		<div class="item-grid">
-			{#each featuredItems as item (item.slug)}
+			{#each data.featured as item (item.slug)}
 				<ItemCard
 					{item}
 					inCart={cart.has(item.slug)}
@@ -70,7 +72,7 @@
 		<a class="cart-bar glass" href="/tienda/carrito">
 			<span class="cart-bar-icon" aria-hidden="true">🛒</span>
 			<span>{cart.count} {cart.count === 1 ? 'producto' : 'productos'} en el carrito</span>
-			<span class="cart-bar-total">{formatCOP(cart.subtotal)}</span>
+			<span class="cart-bar-total">{formatCOP(cart.subtotalCents)}</span>
 			<span class="cart-bar-go">Ver carrito →</span>
 		</a>
 	{/if}

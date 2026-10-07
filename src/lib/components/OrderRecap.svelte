@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { formatCOP, shippingOptions } from '#lib/data/shop';
+	import { formatCOP } from '#lib/data/shop';
+	import { cartLineKey, unitPriceCents } from '#lib/data/types';
 	import type { CartLine } from '#lib/data/types';
-	import type { ShippingId } from '#lib/data/shop';
+	import { shippingOptions, type ShippingId } from '#lib/data/shop';
 
 	interface Props {
 		lines: CartLine[];
@@ -13,10 +14,12 @@
 
 	let { lines, shipping, onShippingChange, selectable = true }: Props = $props();
 
-	let subtotal = $derived(lines.reduce((sum, line) => sum + line.item.price * line.quantity, 0));
+	let subtotalCents = $derived(
+		lines.reduce((sum, line) => sum + unitPriceCents(line.item, line.variant) * line.quantity, 0)
+	);
 	let selected = $derived(shippingOptions.find((option) => option.id === shipping)!);
-	let shippingCost = $derived(selected.cost);
-	let total = $derived(subtotal + shippingCost);
+	let shippingCents = $derived(selected.costCents);
+	let totalCents = $derived(subtotalCents + shippingCents);
 </script>
 
 <section class="recap glass" aria-labelledby="recap-title">
@@ -26,14 +29,20 @@
 		<p class="recap-empty">Tu carrito está vacío 🐾</p>
 	{:else}
 		<ul class="line-list">
-			{#each lines as line (line.item.slug)}
+			{#each lines as line (cartLineKey(line.item.slug, line.variant?.id ?? null))}
 				<li class="line">
 					<span class="line-media" aria-hidden="true">{line.item.emoji}</span>
 					<span class="line-text">
-						<span class="line-name">{line.item.name}</span>
-						<span class="line-qty">{line.quantity} × {formatCOP(line.item.price)}</span>
+						<span class="line-name">
+							{line.item.name}{#if line.variant}<span class="line-variant"> · {line.variant.label}</span>{/if}
+						</span>
+						<span class="line-qty">
+							{line.quantity} × {formatCOP(unitPriceCents(line.item, line.variant))}
+						</span>
 					</span>
-					<span class="line-total">{formatCOP(line.item.price * line.quantity)}</span>
+					<span class="line-total">
+						{formatCOP(unitPriceCents(line.item, line.variant) * line.quantity)}
+					</span>
 				</li>
 			{/each}
 		</ul>
@@ -55,7 +64,7 @@
 						<span class="shipping-detail">{option.detail}</span>
 					</span>
 					<span class="shipping-cost">
-						{option.cost === 0 ? 'Gratis' : `+${formatCOP(option.cost)}`}
+						{option.costCents === 0 ? 'Gratis' : `+${formatCOP(option.costCents)}`}
 					</span>
 				</label>
 			{/each}
@@ -64,15 +73,15 @@
 		<dl class="totals">
 			<div>
 				<dt>Subtotal</dt>
-				<dd>{formatCOP(subtotal)}</dd>
+				<dd>{formatCOP(subtotalCents)}</dd>
 			</div>
 			<div>
 				<dt>Envío ({selected.label})</dt>
-				<dd>{shippingCost === 0 ? 'Gratis' : formatCOP(shippingCost)}</dd>
+				<dd>{shippingCents === 0 ? 'Gratis' : formatCOP(shippingCents)}</dd>
 			</div>
 			<div class="totals-grand">
 				<dt>Total</dt>
-				<dd>{formatCOP(total)}</dd>
+				<dd>{formatCOP(totalCents)}</dd>
 			</div>
 		</dl>
 	{/if}
@@ -130,6 +139,11 @@
 
 	.line-name {
 		font-weight: 700;
+	}
+
+	.line-variant {
+		font-weight: 400;
+		opacity: 0.75;
 	}
 
 	.line-qty {

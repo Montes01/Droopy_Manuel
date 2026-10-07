@@ -1,23 +1,22 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	import ItemCard from '#lib/components/ItemCard.svelte';
 	import ItemModal from '#lib/components/ItemModal.svelte';
-	import { categoryBySlug, itemsByCategory, shopCategories } from '#lib/data/shop';
-	import type { ShopItem } from '#lib/data/types';
+	import type { ShopItem, ShopVariant } from '#lib/data/types';
 	import { site, pageTitle } from '#lib/site';
 	import { useCart } from '#lib/stores/cart.svelte';
 
 	const cart = useCart();
 
-	let slug = $derived(page.params.slug ?? '');
-	let category = $derived(categoryBySlug(slug));
-	let items = $derived(itemsByCategory(slug));
+	let { data } = $props();
+
+	let category = $derived(data.category);
+	let items = $derived(data.items);
 	let title = $derived(pageTitle(category ? category.name : 'Tienda Solidaria'));
 
 	let selected: ShopItem | null = $state(null);
 
-	function add(item: ShopItem, quantity = 1) {
-		cart.add(item, quantity);
+	function add(item: ShopItem, variant: ShopVariant | null = null, quantity = 1) {
+		cart.add(item, variant, quantity);
 	}
 </script>
 
@@ -58,7 +57,7 @@
 		<div class="other-categories">
 			<p class="other-title">Otras categorías</p>
 			<ul>
-				{#each shopCategories as other (other.slug)}
+				{#each data.categories as other (other.slug)}
 					{#if other.slug !== category.slug}
 						<li>
 							<a href={`/tienda/${other.slug}`}>{other.emoji} {other.name}</a>

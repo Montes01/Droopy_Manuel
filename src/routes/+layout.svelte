@@ -1,10 +1,18 @@
 <script lang="ts">
 	import '../app.css';
+	import { page } from '$app/state';
 	import Navbar from '#lib/components/Navbar.svelte';
 	import Footer from '#lib/components/Footer.svelte';
 	import { site } from '#lib/site';
+	import { initCart } from '#lib/stores/cart.svelte';
 
 	let { children } = $props();
+
+	// Carrito disponible para todo el árbol de la app (contexto de Svelte).
+	initCart();
+
+	// Las páginas de tienda/carrito/pago van sin footer para no distraer del flujo.
+	let showFooter = $derived(!page.url.pathname.startsWith('/tienda'));
 </script>
 
 <svelte:head>
@@ -45,4 +53,6 @@
 
 <Navbar />
 {@render children()}
-<Footer />
+{#if showFooter}
+	<Footer />
+{/if}

@@ -64,3 +64,44 @@ export interface SiteStats {
 	sterilized: number;
 	inCare: number;
 }
+
+/** Categoría de la tienda solidaria. `slug` se usa en la ruta /tienda/[slug]. */
+export interface ShopCategory {
+	slug: string;
+	name: string;
+	emoji: string;
+	blurb: string;
+}
+
+/** Producto de la tienda. Precios en pesos colombianos (COP). */
+export interface ShopItem {
+	slug: string;
+	name: string;
+	/** Slug de la categoría a la que pertenece. */
+	category: string;
+	price: number;
+	/** Descripción corta para la tarjeta y el modal. */
+	description: string;
+	/** Detalles largos mostrados en el modal. */
+	details: string;
+	/** Ruta en /static cuando haya foto real. Null = holder ilustrado. */
+	photo: string | null;
+	/** Emoji de respaldo mientras no hay foto real. */
+	emoji: string;
+	/** Etiquetas rápidas (material, talla, etc.). */
+	tags: string[];
+	featured?: boolean;
+}
+
+/** Línea del carrito: producto + cantidad elegida. */
+export interface CartLine {
+	item: ShopItem;
+	quantity: number;
+}
+
+/** Resumen de totales de la compra. */
+export interface CartTotals {
+	subtotal: number;
+	shipping: number;
+	total: number;
+}

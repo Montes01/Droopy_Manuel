@@ -1,8 +1,11 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import Icon from '#lib/components/Icon.svelte';
 	import { nav } from '#lib/site';
+	import { useCart } from '#lib/stores/cart.svelte';
 
 	let open = $state(false);
+	const cart = useCart();
 
 	function close() {
 		open = false;
@@ -28,20 +31,34 @@
 			<img src="/titulo.png" alt="Fundación Droopy Manuel" width="220" height="36" class="brand-title" fetchpriority="high" />
 		</a>
 
-		<button
-			type="button"
-			class="menu-button"
-			aria-expanded={open}
-			aria-controls="primary-nav"
-			aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
-			onclick={toggle}
-		>
-			<span class="menu-icon" aria-hidden="true">
-				<span></span>
-				<span></span>
-				<span></span>
-			</span>
-		</button>
+		<div class="actions">
+			<a
+				href="/tienda/carrito"
+				class="cart-button"
+				aria-label={`Carrito de compras, ${cart.count} ${cart.count === 1 ? 'producto' : 'productos'}`}
+				onclick={close}
+			>
+				<Icon name="cart" size={22} />
+				{#if cart.count > 0}
+					<span class="cart-badge" aria-hidden="true">{cart.count}</span>
+				{/if}
+			</a>
+
+			<button
+				type="button"
+				class="menu-button"
+				aria-expanded={open}
+				aria-controls="primary-nav"
+				aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+				onclick={toggle}
+			>
+				<span class="menu-icon" aria-hidden="true">
+					<span></span>
+					<span></span>
+					<span></span>
+				</span>
+			</button>
+		</div>
 
 		<nav id="primary-nav" class="nav glass" class:open aria-label="Navegación principal">
 			<ul>
@@ -123,6 +140,43 @@
 		border-radius: 0.625rem;
 		cursor: pointer;
 		color: inherit;
+	}
+
+	.actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.cart-button {
+		position: relative;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: var(--tap-min);
+		min-height: var(--tap-min);
+		border-radius: 0.625rem;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.cart-badge {
+		position: absolute;
+		top: 0.125rem;
+		right: 0.125rem;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.25rem;
+		height: 1.25rem;
+		padding-inline: 0.25rem;
+		border-radius: 999px;
+		background: #c62828;
+		color: #fffdf8;
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1;
 	}
 
 	.menu-icon {
@@ -226,7 +280,12 @@
 			display: none;
 		}
 
+		.topbar-inner {
+			justify-content: flex-start;
+		}
+
 		.nav {
+			order: 2;
 			display: block;
 			position: static;
 			visibility: visible;
@@ -236,6 +295,11 @@
 			border-bottom: 0;
 			box-shadow: none;
 			transition: none;
+			margin-inline: auto 0.5rem;
+		}
+
+		.actions {
+			order: 3;
 		}
 
 		.nav ul {

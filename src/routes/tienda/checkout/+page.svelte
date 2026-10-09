@@ -3,14 +3,20 @@
 	import OrderRecap from '#lib/components/OrderRecap.svelte';
 	import TransferInfo from '#lib/components/TransferInfo.svelte';
 	import { createOrder } from '#lib/api/shop';
-	import { bankAccounts } from '#lib/data/fundraisers';
-	import { formatCOP } from '#lib/data/shop';
-	import type { OrderCustomer, OrderResult } from '#lib/data/types';
+	import { formatCOP } from '#lib/data/format';
+	import type { BankAccount, OrderCustomer, OrderResult } from '#lib/data/types';
 	import { pageTitle } from '#lib/site';
 	import { useCart } from '#lib/stores/cart.svelte';
+	import { useContact } from '#lib/stores/contact.svelte';
 
 	const title = pageTitle('Finalizar compra');
 	const cart = useCart();
+	const contact = useContact();
+
+	let { data } = $props();
+
+	/** Cuentas para transferir, traídas de la API por el loader. */
+	const bankAccounts: BankAccount[] = data.accounts;
 
 	type Form = OrderCustomer;
 
@@ -220,7 +226,7 @@
 						type="tel"
 						bind:value={form.telefono}
 						autocomplete="tel"
-						placeholder="Ej. 322 643 8857"
+						placeholder={`Ej. ${contact.phoneDisplay || '300 000 0000'}`}
 						required
 						aria-invalid={errors.telefono ? 'true' : undefined}
 					/>
@@ -261,7 +267,12 @@
 			</form>
 
 			<div class="checkout-aside">
-				<OrderRecap lines={cart.lines} shipping={cart.shipping} selectable={false} />
+				<OrderRecap
+					lines={cart.lines}
+					shipping={cart.shipping}
+					shippingOptions={cart.shippingOptions}
+					selectable={false}
+				/>
 				<TransferInfo />
 			</div>
 		</div>

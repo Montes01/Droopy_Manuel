@@ -1,7 +1,7 @@
 <script lang="ts">
 	import ItemCard from '#lib/components/ItemCard.svelte';
 	import ItemModal from '#lib/components/ItemModal.svelte';
-	import { formatCOP } from '#lib/data/shop';
+	import { formatCOP } from '#lib/data/format';
 	import type { ShopItem, ShopVariant } from '#lib/data/types';
 	import { site, pageTitle } from '#lib/site';
 	import { useCart } from '#lib/stores/cart.svelte';
@@ -77,7 +77,12 @@
 		</a>
 	{/if}
 
-	<ItemModal item={selected} onclose={() => (selected = null)} onadd={add} />
+	<ItemModal
+		item={selected}
+		categories={data.categories}
+		onclose={() => (selected = null)}
+		onadd={add}
+	/>
 </main>
 
 <style>

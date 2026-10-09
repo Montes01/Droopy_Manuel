@@ -1,3 +1,11 @@
+/**
+ * Metadatos estáticos del sitio: nombre, descripción, locale.
+ *
+ * Son valores de presentación que no cambian en tiempo de ejecución, así que
+ * viven en el frontend para poder usarlos en `<svelte:head>` sin esperar a la
+ * API. Los datos de contacto reales (WhatsApp, correo, redes) los sirve el
+ * backend: ver `#lib/stores/contact.svelte`.
+ */
 export const site = {
 	name: 'Droopy Manuel',
 	title: 'Droopy Manuel',
@@ -17,14 +25,6 @@ export const nav = [
 	{ label: '⭐ Dona estrellas', href: '/dona-estrellas' },
 	{ label: '🛍️ Tienda Solidaria', href: '/tienda' },
 	{ label: '📰 Noticias', href: '/noticias' }
-] as const;
-
-export const socials = [
-	{ label: 'TikTok', icon: '/icons/tiktok.png', href: 'https://www.tiktok.com/@droopy.manuel?_r=1&_t=ZS-941vqEuOvdy' },
-	{ label: 'Instagram', icon: '/icons/instagram.png', href: 'https://www.instagram.com/droopymanuel?igsh=MTFtbmFuaHhkbWwweQ==' },
-	{ label: 'Facebook', icon: '/icons/facebook.png', href: 'https://www.facebook.com/share/18BXEMcn6s/' },
-	{ label: 'YouTube', icon: '/icons/youtube.png', href: 'https://www.youtube.com/@droopymanuel' },
-	{ label: 'WhatsApp', icon: '/icons/whatsapp.png', href: 'https://wa.me/573226438857' }
 ] as const;
 
 export function pageTitle(page?: string): string {

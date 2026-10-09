@@ -1,7 +1,13 @@
 import { getContext, setContext } from 'svelte';
-import { SHIPPING_COST_CENTS, type ShippingId } from '#lib/data/shop';
-import { cartLineKey, unitPriceCents, unitStock } from '#lib/data/types';
-import type { CartLine, CartTotals, ShopItem, ShopVariant } from '#lib/data/types';
+import { cartLineKey, unitPriceCents, unitStock } from '#lib/data/format';
+import type {
+	CartLine,
+	CartTotals,
+	ShippingId,
+	ShippingOption,
+	ShopItem,
+	ShopVariant
+} from '#lib/data/types';
 
 const STORAGE_KEY = 'droopy-cart';
 const SHIPPING_KEY = 'droopy-cart-shipping';
@@ -43,6 +49,12 @@ export class CartStore {
 	lines = $state<CartLine[]>(loadLines());
 	shipping = $state<ShippingId>(loadShipping());
 
+	/**
+	 * Opciones de entrega con sus costos, tal como las sirve la API.
+	 * Las fija el layout al arrancar; hasta entonces no hay costo que mostrar.
+	 */
+	shippingOptions = $state<ShippingOption[]>([]);
+
 	constructor() {
 		// Persistencia simple: cada cambio se refleja en localStorage.
 		$effect.root(() => {
@@ -64,7 +76,15 @@ export class CartStore {
 		)
 	);
 
-	shippingCents = $derived(this.shipping === 'domicilio' ? SHIPPING_COST_CENTS : 0);
+	/**
+	 * Costo del envío elegido, tomado de las opciones de la API.
+	 *
+	 * No hay copia local del precio: si el backend cambia el costo, el carrito
+	 * lo refleja sin tocar código. El pedido final lo recalcula el servidor.
+	 */
+	shippingCents = $derived(
+		this.shippingOptions.find((option) => option.id === this.shipping)?.costCents ?? 0
+	);
 
 	totals = $derived<CartTotals>({
 		subtotalCents: this.subtotalCents,
@@ -130,6 +150,11 @@ export class CartStore {
 
 	setShipping(id: ShippingId) {
 		this.shipping = id;
+	}
+
+	/** Publica las opciones de entrega que vienen de la API. */
+	setShippingOptions(options: ShippingOption[]) {
+		this.shippingOptions = options;
 	}
 }
 

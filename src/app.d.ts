@@ -1,3 +1,5 @@
+/// <reference types="vite/client" />
+
 // See https://svelte.dev/docs/kit/types#app.d.ts
 // for information about these interfaces
 declare global {
@@ -8,6 +10,15 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+}
+
+interface ImportMetaEnv {
+	/** URL base del backend, ej. http://localhost:3000 */
+	readonly PUBLIC_API_URL?: string;
+}
+
+interface ImportMeta {
+	readonly env: ImportMetaEnv;
 }
 
 export {};

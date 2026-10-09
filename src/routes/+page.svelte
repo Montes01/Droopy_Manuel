@@ -1,9 +1,14 @@
 <script lang="ts">
 	import HomeCard from '#lib/components/HomeCard.svelte';
 	import { site, pageTitle } from '#lib/site';
-	import { news } from '#lib/data/content';
+	import type { NewsItem } from '#lib/data/types';
 
 	const title = pageTitle('Home');
+
+	let { data } = $props();
+
+	/** Últimas noticias para el bloque de la portada (lo trae +page.ts). */
+	let news = $derived<NewsItem[]>(data.news);
 </script>
 
 <svelte:head>
@@ -73,10 +78,10 @@
 			{#each news as item}
 				<article class="news-card glass">
 					<div class="news-holder" aria-hidden="true">
-						{#if item.image}
-							<img src={item.image} alt="" loading="lazy" decoding="async" />
+						{#if item.photo}
+							<img src={item.photo} alt="" loading="lazy" decoding="async" />
 						{:else}
-							<span class="news-holder-emoji">🐾</span>
+							<span class="news-holder-emoji">{item.emoji ?? '🐾'}</span>
 						{/if}
 					</div>
 					<div class="news-body">

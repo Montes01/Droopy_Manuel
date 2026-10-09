@@ -1,10 +1,12 @@
 <script lang="ts">
-	import { socials } from '#lib/site';
+	import { useContact } from '#lib/stores/contact.svelte';
 
-	const whatsapp = socials.find((social) => social.label === 'WhatsApp')?.href ?? '';
-	const whatsappHref = `${whatsapp}?text=${encodeURIComponent(
-		'¡Hola! Acabo de hacer un pedido en la tienda y envío mi soporte de pago 🐾'
-	)}`;
+	const contact = useContact();
+
+	// El número y el enlace vienen del backend (una sola definición).
+	const whatsappHref = $derived(
+		contact.whatsappLink('¡Hola! Acabo de hacer un pedido en la tienda y envío mi soporte de pago 🐾')
+	);
 </script>
 
 <section class="transfer glass" aria-labelledby="transfer-title">
@@ -26,8 +28,8 @@
 	</ul>
 
 	<p class="send-hint">
-		Al transferir, envía el comprobante al <strong>322 643 8857</strong> para confirmar más rápido
-		🐶✨
+		Al transferir, envía el comprobante al <strong>{contact.phoneDisplay}</strong> para confirmar más
+		rápido 🐶✨
 	</p>
 
 	<a class="send-btn" href={whatsappHref} target="_blank" rel="noreferrer">

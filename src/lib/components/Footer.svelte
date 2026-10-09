@@ -1,11 +1,15 @@
 <script lang="ts">
-	import { site, socials } from '#lib/site';
+	import { site } from '#lib/site';
+	import { useContact } from '#lib/stores/contact.svelte';
+
+	// Las redes vienen del backend, no de una lista local.
+	const contact = useContact();
 </script>
 
 <footer class="site-footer">
 	<p class="footer-title">📬 Contáctanos 📬</p>
 	<div class="contact-grid">
-		{#each socials as item}
+		{#each contact.socials as item (item.label)}
 			<a
 				class="contact-btn glass"
 				href={item.href}

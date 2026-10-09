@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { NewsItem } from '#lib/data/types';
-	import { categoryLabels } from '#lib/data/news';
+	import { categoryLabels } from '#lib/data/news-labels';
 	import { site, pageTitle } from '#lib/site';
 
 	interface Props {

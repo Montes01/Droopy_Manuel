@@ -1,13 +1,15 @@
 <script lang="ts">
 	import Icon from '#lib/components/Icon.svelte';
 	import OrderRecap from '#lib/components/OrderRecap.svelte';
-	import { formatCOP } from '#lib/data/shop';
-	import { cartLineKey, unitPriceCents, unitStock } from '#lib/data/types';
+	import { cartLineKey, formatCOP, unitPriceCents, unitStock } from '#lib/data/format';
 	import { pageTitle } from '#lib/site';
 	import { useCart } from '#lib/stores/cart.svelte';
 
 	const title = pageTitle('Carrito');
 	const cart = useCart();
+
+	// Las opciones de entrega las publica el layout desde la API.
+	const shippingOptions = $derived(cart.shippingOptions);
 </script>
 
 <svelte:head>
@@ -88,6 +90,7 @@
 				<OrderRecap
 					lines={cart.lines}
 					shipping={cart.shipping}
+					{shippingOptions}
 					onShippingChange={(id) => cart.setShipping(id)}
 				/>
 				<a class="primary-btn checkout-btn" href="/tienda/checkout">

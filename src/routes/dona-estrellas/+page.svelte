@@ -1,25 +1,33 @@
 <script lang="ts">
 	import BankAccountCard from '#lib/components/BankAccount.svelte';
 	import StarModal from '#lib/components/StarModal.svelte';
-	import { aboutBlurb } from '#lib/data/content';
-	import { bankAccounts, donationTargets } from '#lib/data/fundraisers';
-	import type { Dog } from '#lib/data/types';
-	import { pageTitle, site, socials } from '#lib/site';
+	import type { BankAccount, Dog } from '#lib/data/types';
+	import { pageTitle, site } from '#lib/site';
+	import { useContact } from '#lib/stores/contact.svelte';
 
 	const title = pageTitle('Dona estrellas');
+
+	const contact = useContact();
+
+	let { data } = $props();
+
+	// Todo viene del loader (+page.ts) y, por debajo, de la API.
+	const bankAccounts: BankAccount[] = data.accounts;
+	const donationTargets: Dog[] = data.dogs;
+	const aboutBlurb: string = data.aboutBlurb;
 
 	let open = $state(false);
 	let selectedSlug: string | null = $state(null);
 
 	let selected = $derived(donationTargets.find((dog) => dog.slug === selectedSlug) ?? null);
 
-	const whatsapp = socials.find((social) => social.label === 'WhatsApp')?.href ?? '';
+	// El enlace sale del número que sirve el backend.
 	const whatsappHref = $derived(
-		selected
-			? `${whatsapp}?text=${encodeURIComponent(
-					`¡Hola! Acabo de donar estrellas para ${selected.name}. Aquí va mi comprobante ⭐`
-				)}`
-			: whatsapp
+		contact.whatsappLink(
+			selected
+				? `¡Hola! Acabo de donar estrellas para ${selected.name}. Aquí va mi comprobante ⭐`
+				: undefined
+		)
 	);
 
 	function pick(dog: Dog) {

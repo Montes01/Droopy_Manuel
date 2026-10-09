@@ -1,18 +1,18 @@
 <script lang="ts">
-	import { formatCOP } from '#lib/data/shop';
-	import { cartLineKey, unitPriceCents } from '#lib/data/types';
-	import type { CartLine } from '#lib/data/types';
-	import { shippingOptions, type ShippingId } from '#lib/data/shop';
+	import { cartLineKey, formatCOP, unitPriceCents } from '#lib/data/format';
+	import type { CartLine, ShippingId, ShippingOption } from '#lib/data/types';
 
 	interface Props {
 		lines: CartLine[];
 		shipping: ShippingId;
+		/** Opciones de entrega traídas de la API. */
+		shippingOptions: ShippingOption[];
 		onShippingChange?: (id: ShippingId) => void;
 		/** Cuando es false, los envíos se muestran como dato fijo (checkout). */
 		selectable?: boolean;
 	}
 
-	let { lines, shipping, onShippingChange, selectable = true }: Props = $props();
+	let { lines, shipping, shippingOptions, onShippingChange, selectable = true }: Props = $props();
 
 	let subtotalCents = $derived(
 		lines.reduce((sum, line) => sum + unitPriceCents(line.item, line.variant) * line.quantity, 0)

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Icon from '#lib/components/Icon.svelte';
-	import { formatCOP } from '#lib/data/shop';
+	import { formatCOP } from '#lib/data/format';
 	import type { ShopItem } from '#lib/data/types';
 
 	interface Props {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { categoryLabels } from '#lib/data/news';
+	import { categoryLabels } from '#lib/data/news-labels';
 	import { site, pageTitle } from '#lib/site';
 
 	let { data } = $props();

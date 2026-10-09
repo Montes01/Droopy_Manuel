@@ -1,16 +1,17 @@
 <script lang="ts">
 	import Icon from '#lib/components/Icon.svelte';
-	import { categoryBySlug, formatCOP } from '#lib/data/shop';
-	import { unitPriceCents, unitStock } from '#lib/data/types';
-	import type { ShopItem, ShopVariant } from '#lib/data/types';
+	import { formatCOP, unitPriceCents, unitStock } from '#lib/data/format';
+	import type { ShopCategory, ShopItem, ShopVariant } from '#lib/data/types';
 
 	interface Props {
 		item: ShopItem | null;
 		onclose: () => void;
 		onadd: (item: ShopItem, variant: ShopVariant | null, quantity: number) => void;
+		/** Categorías disponibles, para mostrar la del producto abierto. */
+		categories?: ShopCategory[];
 	}
 
-	let { item, onclose, onadd }: Props = $props();
+	let { item, onclose, onadd, categories = [] }: Props = $props();
 
 	let closing = $state(false);
 	let quantity = $state(1);
@@ -25,7 +26,7 @@
 		}
 	});
 
-	let category = $derived(item ? categoryBySlug(item.category) : undefined);
+	let category = $derived(categories.find((entry) => entry.slug === item?.category));
 	let variant = $derived(item?.variants.find((entry) => entry.id === variantId) ?? null);
 	let stock = $derived(item ? unitStock(item, variant) : 0);
 	let priceCents = $derived(item ? unitPriceCents(item, variant) : 0);

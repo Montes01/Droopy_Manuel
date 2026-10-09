@@ -5,11 +5,21 @@
 	import Footer from '#lib/components/Footer.svelte';
 	import { site } from '#lib/site';
 	import { initCart } from '#lib/stores/cart.svelte';
+	import { initContact } from '#lib/stores/contact.svelte';
 
-	let { children } = $props();
+	let { children, data } = $props();
 
 	// Carrito disponible para todo el árbol de la app (contexto de Svelte).
-	initCart();
+	const cart = initCart();
+
+	// Contacto (WhatsApp, redes) para todo el árbol.
+	initContact(data.contact);
+
+	// Las opciones de entrega vienen de la API: el carrito no guarda copia
+	// del costo de envío, lo lee de aquí.
+	$effect(() => {
+		cart.setShippingOptions(data.shippingOptions);
+	});
 
 	// Las páginas de tienda/carrito/pago y de noticias van sin footer:
 	// la tienda para no distraer del flujo, noticias porque es lectura larga.

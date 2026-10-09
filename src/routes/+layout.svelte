@@ -26,6 +26,10 @@
 	let showFooter = $derived(
 		!page.url.pathname.startsWith('/tienda') && !page.url.pathname.startsWith('/noticias')
 	);
+
+	// El panel tiene su propia cabecera y navegación: no lleva nada de la web
+	// pública alrededor, ni navbar ni footer.
+	let isAdmin = $derived(page.url.pathname.startsWith('/admin'));
 </script>
 
 <svelte:head>
@@ -64,8 +68,12 @@
 	<meta property="og:image:alt" content={site.name} />
 </svelte:head>
 
-<Navbar />
-{@render children()}
-{#if showFooter}
-	<Footer />
-{/if}
+	{#if isAdmin}
+		{@render children()}
+	{:else}
+		<Navbar />
+		{@render children()}
+		{#if showFooter}
+			<Footer />
+		{/if}
+	{/if}

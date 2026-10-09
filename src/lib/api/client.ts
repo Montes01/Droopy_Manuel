@@ -41,6 +41,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 	try {
 		response = await fetch(url, {
 			...init,
+			// El panel se autentica con cookie de sesión. Sin esto, el navegador
+			// no la envía en peticiones cross-origin (5173 → 3100) y todo da 401.
+			credentials: 'include',
 			headers: {
 				Accept: 'application/json',
 				...(init?.body ? { 'Content-Type': 'application/json' } : {}),
@@ -94,6 +97,14 @@ async function getOrNull<T>(path: string): Promise<T | null> {
 export const api = {
 	get: <T>(path: string) => request<T>(path),
 	getOrNull,
-	post: <T>(path: string, body: unknown) =>
-		request<T>(path, { method: 'POST', body: JSON.stringify(body) })
+	post: <T>(path: string, body?: unknown) =>
+		request<T>(path, {
+			method: 'POST',
+			...(body === undefined ? {} : { body: JSON.stringify(body) })
+		}),
+	patch: <T>(path: string, body: unknown) =>
+		request<T>(path, { method: 'PATCH', body: JSON.stringify(body) }),
+	put: <T>(path: string, body: unknown) =>
+		request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
+	delete: <T>(path: string) => request<T>(path, { method: 'DELETE' })
 };

@@ -36,7 +36,7 @@
 
 <main class="container category-page">
 	{#if category}
-		<p class="tagline">{category.emoji} {category.name} {category.emoji}</p>
+		<p class="tagline">{#if category.emoji}{category.emoji} {/if}{category.name}</p>
 		<p class="intro">{category.blurb}</p>
 
 		{#if items.length > 0}
@@ -60,7 +60,9 @@
 				{#each data.categories as other (other.slug)}
 					{#if other.slug !== category.slug}
 						<li>
-							<a href={`/tienda/${other.slug}`}>{other.emoji} {other.name}</a>
+							<a href={`/tienda/${other.slug}`}
+								>{#if other.emoji}{other.emoji} {/if}{other.name}</a
+							>
 						</li>
 					{/if}
 				{/each}

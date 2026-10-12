@@ -99,8 +99,8 @@
 				</label>
 
 				<label>
-					Emoji *
-					<input class="emoji-input" name="emoji" value={editing?.emoji ?? ''} placeholder="🚑" required />
+					Emoji (opcional)
+					<input class="emoji-input" name="emoji" value={editing?.emoji ?? ''} placeholder="🚑" />
 				</label>
 
 				<label>
@@ -178,7 +178,7 @@
 				<tr>
 					<td>
 						<span class="avatar" aria-hidden="true">
-							{#if item.photo}<img src={item.photo} alt="" />{:else}{item.emoji}{/if}
+							{#if item.photo}<img src={item.photo} alt="" />{:else}{item.emoji || item.title.charAt(0)}{/if}
 						</span>
 						<span class="name">
 							<strong>{item.title}</strong>

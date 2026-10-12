@@ -15,9 +15,11 @@
 		activeCategory ? data.items.filter((item) => item.category === activeCategory) : data.items
 	);
 
-	/** Nombre visible de cada categoría, por slug. */
+	/** Nombre visible de cada categoría, por slug. Sin emoji no hay hueco previo. */
 	let categoryNames = $derived(
-		Object.fromEntries(data.categories.map((c) => [c.slug, `${c.emoji} ${c.name}`]))
+		Object.fromEntries(
+			data.categories.map((c) => [c.slug, c.emoji ? `${c.emoji} ${c.name}` : c.name])
+		)
 	);
 
 	/** Cuántos productos tiene cada categoría. */
@@ -85,7 +87,7 @@
 					class:active={activeCategory === category.slug}
 					onclick={() => (activeCategory = category.slug)}
 				>
-					{category.emoji} {category.name}
+					{#if category.emoji}{category.emoji} {/if}{category.name}
 					<span class="count">{countsByCategory[category.slug] ?? 0}</span>
 				</button>
 				<span class="cat-actions">
@@ -125,7 +127,7 @@
 					>
 						<input type="hidden" name="slug" value={category.slug} />
 						<input name="name" value={category.name} placeholder="Nombre" required />
-						<input class="emoji-input" name="emoji" value={category.emoji} placeholder="Emoji" required />
+						<input class="emoji-input" name="emoji" value={category.emoji} placeholder="Emoji (opcional)" />
 						<input name="blurb" value={category.blurb} placeholder="Descripción" required />
 						<button class="primary small" type="submit">Guardar</button>
 					</form>
@@ -138,7 +140,7 @@
 		<summary>Nueva categoría</summary>
 		<form method="POST" action="?/createCategory" use:enhance>
 			<input name="name" placeholder="Nombre" required />
-			<input class="emoji-input" name="emoji" placeholder="Emoji" required />
+			<input class="emoji-input" name="emoji" placeholder="Emoji (opcional)" />
 			<input name="blurb" placeholder="Descripción" required />
 			<button class="primary small" type="submit">Crear</button>
 		</form>
@@ -175,7 +177,9 @@
 					Categoría *
 					<select name="category" value={editing?.category ?? data.categories[0]?.slug ?? ''}>
 						{#each data.categories as category (category.slug)}
-							<option value={category.slug}>{category.emoji} {category.name}</option>
+							<option value={category.slug}
+							>{#if category.emoji}{category.emoji} {/if}{category.name}</option
+						>
 						{/each}
 					</select>
 				</label>
@@ -192,8 +196,8 @@
 				</label>
 
 				<label>
-					Emoji *
-					<input name="emoji" value={editing?.emoji ?? ''} placeholder="🍖" required />
+					Emoji (opcional)
+					<input name="emoji" value={editing?.emoji ?? ''} placeholder="🍖" />
 				</label>
 
 				<label>
@@ -295,7 +299,7 @@
 				<tr>
 					<td>
 						<span class="avatar" aria-hidden="true">
-							{#if item.photo}<img src={item.photo} alt="" />{:else}{item.emoji}{/if}
+							{#if item.photo}<img src={item.photo} alt="" />{:else}{item.emoji || item.name.charAt(0)}{/if}
 						</span>
 						<span class="name">
 							<strong>{item.name}</strong>

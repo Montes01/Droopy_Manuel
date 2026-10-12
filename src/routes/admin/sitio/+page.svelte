@@ -343,7 +343,7 @@
 			<tbody>
 				{#each data.accounts as account (account.id)}
 					<tr>
-						<td>{account.emoji} <strong>{account.bank}</strong></td>
+						<td>{#if account.emoji}{account.emoji} {/if}<strong>{account.bank}</strong></td>
 						<td><span class="tag">{methodLabels[account.method] ?? account.method}</span></td>
 						<td>{account.holder}</td>
 						<td>
@@ -383,7 +383,7 @@
 		<form method="POST" action="?/createAccount" use:enhance>
 			<div class="grid">
 				<label>Banco *<input name="bank" required /></label>
-				<label>Emoji *<input class="emoji-input" name="emoji" placeholder="🏦" required /></label>
+				<label>Emoji (opcional)<input class="emoji-input" name="emoji" placeholder="🏦" /></label>
 				<label>
 					Método *
 					<select name="method">

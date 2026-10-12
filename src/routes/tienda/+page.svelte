@@ -43,7 +43,7 @@
 			{#each data.categories as category (category.slug)}
 				{@const count = data.counts[category.slug] ?? 0}
 				<a class="category-card glass" href={`/tienda/${category.slug}`}>
-					<span class="category-emoji" aria-hidden="true">{category.emoji}</span>
+					<span class="category-emoji" aria-hidden="true">{category.emoji || '🐾'}</span>
 					<span class="category-body">
 						<span class="category-name">{category.name}</span>
 						<span class="category-blurb">{category.blurb}</span>

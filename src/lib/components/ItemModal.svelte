@@ -71,7 +71,7 @@
 				{#if item.photo}
 					<img src={item.photo} alt="" />
 				{:else}
-					<span class="modal-emoji">{item.emoji}</span>
+					<span class="modal-emoji">{item.emoji || '🐾'}</span>
 				{/if}
 				<button type="button" class="close-btn" onclick={requestClose} aria-label="Cerrar">
 					<Icon name="close" size={20} />
@@ -80,7 +80,7 @@
 
 			<div class="modal-body">
 				{#if category}
-					<p class="modal-category">{category.emoji} {category.name}</p>
+					<p class="modal-category">{#if category.emoji}{category.emoji} {/if}{category.name}</p>
 				{/if}
 				<h3>{item.name}</h3>
 				<p class="modal-price">{formatCOP(priceCents)}</p>

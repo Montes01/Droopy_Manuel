@@ -38,6 +38,16 @@ function text(value: FormDataEntryValue | null): string | undefined {
 }
 
 /**
+ * Lee el emoji del formulario preservando la cadena vacía: así quitar el
+ * emoji al editar lo borra de verdad, en vez de conservar el anterior.
+ * Si el campo no viene, devuelve `undefined` (edición parcial).
+ */
+function emojiField(form: FormData): string | undefined {
+	if (!form.has('emoji')) return undefined;
+	return String(form.get('emoji') ?? '').trim();
+}
+
+/**
  * Lee el cuerpo de la noticia.
  *
  * El formulario usa un `textarea` con un párrafo por línea: es lo más cómodo
@@ -88,7 +98,7 @@ export const actions: Actions = {
 			body,
 			date: text(form.get('date')),
 			category: text(form.get('category')),
-			emoji: text(form.get('emoji')),
+			emoji: emojiField(form),
 			photo: text(form.get('photo')) ?? null,
 			featured: form.get('featured') === 'on',
 			tags: String(form.get('tags') ?? '')
@@ -123,7 +133,7 @@ export const actions: Actions = {
 			body,
 			date: text(form.get('date')),
 			category: text(form.get('category')),
-			emoji: text(form.get('emoji')),
+			emoji: emojiField(form),
 			photo: text(form.get('photo')) ?? null,
 			featured: form.get('featured') === 'on',
 			tags: String(form.get('tags') ?? '')

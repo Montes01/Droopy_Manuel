@@ -31,7 +31,7 @@
 		<ul class="line-list">
 			{#each lines as line (cartLineKey(line.item.slug, line.variant?.id ?? null))}
 				<li class="line">
-					<span class="line-media" aria-hidden="true">{line.item.emoji}</span>
+					<span class="line-media" aria-hidden="true">{line.item.emoji || '🐾'}</span>
 					<span class="line-text">
 						<span class="line-name">
 							{line.item.name}{#if line.variant}<span class="line-variant"> · {line.variant.label}</span>{/if}

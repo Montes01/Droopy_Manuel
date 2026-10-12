@@ -15,7 +15,7 @@
 		{#if item.photo}
 			<img src={item.photo} alt="" loading="lazy" decoding="async" />
 		{:else}
-			<span class="news-emoji">{item.emoji}</span>
+			<span class="news-emoji">{item.emoji || '🐾'}</span>
 		{/if}
 	</div>
 	<div class="news-body">

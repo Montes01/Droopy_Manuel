@@ -49,6 +49,16 @@ function num(value: FormDataEntryValue | null): number | undefined {
 }
 
 /**
+ * Lee el emoji del formulario preservando la cadena vacía: así quitar el
+ * emoji al editar lo borra de verdad, en vez de conservar el anterior.
+ * Si el campo no viene, devuelve `undefined` (edición parcial).
+ */
+function emojiField(form: FormData): string | undefined {
+	if (!form.has('emoji')) return undefined;
+	return String(form.get('emoji') ?? '').trim();
+}
+
+/**
  * Lee las variantes enviadas por el formulario.
  *
  * El formulario manda tres listas paralelas (etiqueta, stock y precio), que
@@ -98,7 +108,7 @@ export const actions: Actions = {
 			priceCents: toCents(form.get('price')),
 			description: text(form.get('description')),
 			details: text(form.get('details')),
-			emoji: text(form.get('emoji')),
+			emoji: emojiField(form),
 			photo: text(form.get('photo')) ?? null,
 			tags: String(form.get('tags') ?? '')
 				.split(',')
@@ -129,7 +139,7 @@ export const actions: Actions = {
 			priceCents: toCents(form.get('price')),
 			description: text(form.get('description')),
 			details: text(form.get('details')),
-			emoji: text(form.get('emoji')),
+			emoji: emojiField(form),
 			photo: text(form.get('photo')) ?? null,
 			tags: String(form.get('tags') ?? '')
 				.split(',')
@@ -197,7 +207,7 @@ export const actions: Actions = {
 
 		const input = {
 			name: text(form.get('name')),
-			emoji: text(form.get('emoji')),
+			emoji: emojiField(form),
 			blurb: text(form.get('blurb'))
 		};
 
@@ -221,7 +231,7 @@ export const actions: Actions = {
 
 		const input = {
 			name: text(form.get('name')),
-			emoji: text(form.get('emoji')),
+			emoji: emojiField(form),
 			blurb: text(form.get('blurb'))
 		};
 

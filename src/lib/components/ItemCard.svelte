@@ -34,7 +34,7 @@
 			{#if item.photo}
 				<img src={item.photo} alt="" loading="lazy" decoding="async" />
 			{:else}
-				<span class="item-emoji">{item.emoji}</span>
+				<span class="item-emoji">{item.emoji || '🐾'}</span>
 			{/if}
 			{#if soldOut}
 				<span class="stock-pill">Agotado</span>

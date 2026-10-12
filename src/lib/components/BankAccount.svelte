@@ -31,7 +31,7 @@
 
 <article class="bank glass">
 	<header class="bank-head">
-		<span class="bank-emoji" aria-hidden="true">{account.emoji}</span>
+		<span class="bank-emoji" aria-hidden="true">{account.emoji || '🏦'}</span>
 		<span class="bank-titles">
 			<span class="bank-name">{account.bank}</span>
 			<span class="bank-holder">{account.holder}</span>

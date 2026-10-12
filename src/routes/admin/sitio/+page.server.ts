@@ -54,6 +54,16 @@ function text(value: FormDataEntryValue | null): string | undefined {
 	return trimmed === '' ? undefined : trimmed;
 }
 
+/**
+ * Lee el emoji del formulario preservando la cadena vacía: así quitar el
+ * emoji al editar lo borra de verdad, en vez de conservar el anterior.
+ * Si el campo no viene, devuelve `undefined` (edición parcial).
+ */
+function emojiField(form: FormData): string | undefined {
+	if (!form.has('emoji')) return undefined;
+	return String(form.get('emoji') ?? '').trim();
+}
+
 /** Lee un entero, o `undefined` si no se envió. */
 function toInt(value: FormDataEntryValue | null): number | undefined {
 	const raw = text(value);
@@ -282,7 +292,7 @@ export const actions: Actions = {
 
 		const input = {
 			bank: text(form.get('bank')),
-			emoji: text(form.get('emoji')),
+			emoji: emojiField(form),
 			method: text(form.get('method')),
 			holder: text(form.get('holder')),
 			fields

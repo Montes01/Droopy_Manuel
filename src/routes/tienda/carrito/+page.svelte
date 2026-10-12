@@ -40,7 +40,7 @@
 						{@const unit = unitPriceCents(line.item, line.variant)}
 						{@const max = unitStock(line.item, line.variant)}
 						<li class="cart-line glass">
-							<span class="line-media" aria-hidden="true">{line.item.emoji}</span>
+							<span class="line-media" aria-hidden="true">{line.item.emoji || '🐾'}</span>
 							<div class="line-body">
 								<a class="line-name" href={`/tienda/${line.item.category}`}>
 									{line.item.name}{#if line.variant}<span class="line-variant"> · {line.variant.label}</span>{/if}

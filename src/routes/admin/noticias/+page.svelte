@@ -104,10 +104,6 @@
 					<input class="emoji-input" name="emoji" value={editing?.emoji ?? ''} placeholder="🚑" />
 				</label>
 
-				{#key editing?.slug ?? 'nuevo'}
-					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="noticias" />
-				{/key}
-
 				<label class="wide">
 					Bajada corta *
 					<input name="excerpt" value={editing?.excerpt ?? ''} required />
@@ -123,6 +119,12 @@
 					<input name="tags" value={editing?.tags.join(', ') ?? ''} placeholder="rescate, cachorros" />
 				</label>
 			</div>
+
+			{#key editing?.slug ?? 'nuevo'}
+				<div class="image-upload-wrapper">
+					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="noticias" />
+				</div>
+			{/key}
 
 			<fieldset>
 				<legend>Perritos relacionados</legend>
@@ -274,6 +276,10 @@
 		background: #fff;
 		border: 1px dashed #ccd2d9;
 		border-radius: 0.625rem;
+	}
+
+	.image-upload-wrapper {
+		margin: 1.5rem 0;
 	}
 
 	.editor {

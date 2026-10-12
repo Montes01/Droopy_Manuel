@@ -15,7 +15,7 @@ export function formatCOP(cents: Cents): string {
 
 /** Formatea la edad de un perro a partir de su fecha de nacimiento y bandera approx. */
 export function formatDogAge(birthDate: ISODate | null, isApprox: boolean): string {
-	if (!birthDate) return 'Desconocida';
+	if (!birthDate) return 'Edad desconocida';
 	const today = new Date();
 	const birth = new Date(birthDate);
 	const years = today.getFullYear() - birth.getFullYear();

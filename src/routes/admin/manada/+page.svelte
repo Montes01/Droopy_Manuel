@@ -86,8 +86,8 @@
 				</label>
 
 				<label>
-					Fecha de nacimiento *
-					<input name="birthDate" type="date" required />
+					Fecha de nacimiento
+					<input name="birthDate" type="date" />
 				</label>
 
 				<label>

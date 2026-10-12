@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
+	import ImageUpload from '#lib/components/ImageUpload.svelte';
 	import type { Dog } from '#lib/data/admin-types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -134,10 +135,9 @@
 					<input name="arrival" type="date" value={editing?.arrival ?? ''} required />
 				</label>
 
-				<label>
-					Foto (ruta)
-					<input name="photo" value={editing?.photo ?? ''} placeholder="/perros/luna.jpg" />
-				</label>
+				{#key editing?.slug ?? 'nuevo'}
+					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="manada" />
+				{/key}
 
 				<label class="wide">
 					Rasgos (separados por coma)

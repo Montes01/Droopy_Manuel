@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
+	import ImageUpload from '#lib/components/ImageUpload.svelte';
 	import type { NewsItem } from '#lib/data/types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -103,10 +104,9 @@
 					<input class="emoji-input" name="emoji" value={editing?.emoji ?? ''} placeholder="🚑" />
 				</label>
 
-				<label>
-					Foto (ruta)
-					<input name="photo" value={editing?.photo ?? ''} placeholder="/noticias/rescate.jpg" />
-				</label>
+				{#key editing?.slug ?? 'nuevo'}
+					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="noticias" />
+				{/key}
 
 				<label class="wide">
 					Bajada corta *

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
+	import ImageUpload from '#lib/components/ImageUpload.svelte';
 	import type { ShopItem } from '#lib/data/types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -200,10 +201,9 @@
 					<input name="emoji" value={editing?.emoji ?? ''} placeholder="🍖" />
 				</label>
 
-				<label>
-					Foto (ruta)
-					<input name="photo" value={editing?.photo ?? ''} placeholder="/productos/taza.jpg" />
-				</label>
+				{#key editing?.slug ?? 'nuevo'}
+					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="tienda" />
+				{/key}
 
 				<label>
 					Stock (si no tiene variantes)

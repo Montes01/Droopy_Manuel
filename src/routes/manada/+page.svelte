@@ -10,6 +10,18 @@
 
 	let view = $state<PackView>('alive');
 
+	/**
+	 * Inclinación pseudoaleatoria por perrito (±0.8°–3.2°): suficiente para
+	 * el look de fotos reveladas, nunca de cabeza. Determinista a partir
+	 * del slug para que SSR e hidratación coincidan.
+	 */
+	function tiltFor(slug: string): number {
+		let hash = 0;
+		for (const char of slug) hash = (hash * 31 + char.charCodeAt(0)) | 0;
+		const magnitude = 0.8 + ((Math.abs(hash) % 100) / 100) * 2.4;
+		return (Math.abs(hash) % 2 === 0 ? 1 : -1) * magnitude;
+	}
+
 	let pack = $derived(view === 'alive' ? data.alive : data.heaven);
 	let selected: Dog | null = $state(null);
 </script>
@@ -48,8 +60,10 @@
 	<span class="tap-arrow" aria-hidden="true">⤵</span>
 	</div>
 	<div class="pack-grid">
-		{#each pack as dog}
-			<DogCard {dog} onselect={(d) => (selected = d)} />
+		{#each pack as dog (dog.slug)}
+			<div class="print" style="transform: rotate({tiltFor(dog.slug)}deg)">
+				<DogCard {dog} onselect={(d) => (selected = d)} />
+			</div>
 		{/each}
 	</div>
 	<DogModal dog={selected} onclose={() => (selected = null)} />
@@ -206,7 +220,12 @@
 	.pack-grid {
 		display: grid;
 		grid-template-columns: 1fr;
-		gap: 1.25rem;
+		gap: 1.75rem;
+	}
+
+	/* La inclinación va inline por perrito (ver tiltFor). */
+	.print {
+		will-change: transform;
 	}
 
 	@media (min-width: 48rem) {

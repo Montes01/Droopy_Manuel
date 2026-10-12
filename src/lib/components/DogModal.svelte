@@ -34,7 +34,7 @@
 {#if dog}
 	<div class="backdrop" class:closing onclick={onbackdrop} role="presentation">
 		<div class="modal glass" role="dialog" aria-modal="true" aria-label={dog.name}>
-			<div class="modal-photo" aria-hidden="true">
+			<div class="modal-photo" class:no-photo={!dog.photo} aria-hidden="true">
 				{#if dog.photo}
 					<img src={dog.photo} alt="" />
 				{:else}
@@ -153,14 +153,22 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		aspect-ratio: 16 / 9;
+		width: 100%;
+		height: 320px;
+		margin: 1.25rem auto 0;
+		overflow: hidden;
+		background: #000;
+	}
+
+	.modal-photo.no-photo {
 		background: linear-gradient(135deg, #ffd9a0, #ffb3c7 45%, #b8e0ff);
 	}
 
 	.modal-photo img {
-		width: 100%;
 		height: 100%;
-		object-fit: cover;
+		width: auto;
+		max-width: none;
+		flex: none;
 	}
 
 	.modal-initial {

@@ -24,8 +24,8 @@
 	let meta = $derived(statusMeta[display]);
 </script>
 
-<button type="button" class="dog-card glass status-{display}" onclick={() => onselect(dog)}>
-	<span class="dog-photo" aria-hidden="true">
+<button type="button" class="dog-card status-{display}" onclick={() => onselect(dog)}>
+	<span class="dog-photo" class:no-photo={!dog.photo} aria-hidden="true">
 		{#if dog.photo}
 			<img src={dog.photo} alt="" loading="lazy" decoding="async" />
 		{:else}
@@ -44,12 +44,15 @@
 
 <style>
 	.dog-card {
+		position: relative;
 		display: block;
 		width: 100%;
-		padding: 0;
-		overflow: clip;
-		border-radius: 1.25rem;
-		border: 1px solid rgb(255 255 255 / 0.6);
+		padding: 0.75rem 0.75rem 0;
+		overflow: visible;
+		border-radius: 0.25rem;
+		border: 1px solid rgb(122 63 22 / 0.18);
+		background: #fffdf8;
+		box-shadow: 0 0.75rem 1.75rem rgb(122 63 22 / 0.28);
 		font: inherit;
 		color: inherit;
 		text-align: left;
@@ -59,19 +62,42 @@
 			box-shadow 0.25s ease;
 	}
 
+	/* Cinta adhesiva: la foto está pegada, no flotando. */
+	.dog-card::before {
+		content: '';
+		position: absolute;
+		top: -0.7rem;
+		left: 50%;
+		width: 5.5rem;
+		height: 1.4rem;
+		transform: translateX(-50%) rotate(-3deg);
+		background: rgb(233 213 168 / 0.9);
+		border-left: 1px dashed rgb(122 63 22 / 0.25);
+		border-right: 1px dashed rgb(122 63 22 / 0.25);
+		box-shadow: 0 2px 5px rgb(0 0 0 / 0.15);
+	}
+
 	.dog-photo {
 		position: relative;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		aspect-ratio: 4 / 3;
+		width: 100%;
+		height: 320px;
+		margin: 0.5rem auto 0;
+		overflow: hidden;
+		background: #000;
+	}
+
+	.dog-photo.no-photo {
 		background: linear-gradient(135deg, #ffd9a0, #ffb3c7 45%, #b8e0ff);
 	}
 
 	.dog-photo img {
-		width: 100%;
 		height: 100%;
-		object-fit: cover;
+		width: auto;
+		max-width: none;
+		flex: none;
 	}
 
 	.dog-initial {
@@ -121,28 +147,28 @@
 
 	.dog-body {
 		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
-		gap: 0.75rem;
-		padding: 1rem 1.25rem 1.25rem;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.15rem;
+		padding: 0.9rem 0.5rem 1.1rem;
 	}
 
 	.dog-name {
 		font-family: var(--font-brand);
-		font-size: 2rem;
+		font-size: 1.9rem;
 		line-height: 1.1;
 		color: #7a3f16;
 	}
 
 	.dog-age {
-		font-size: 1.125rem;
-		white-space: nowrap;
-		opacity: 0.85;
+		font-size: 1rem;
+		opacity: 0.75;
 	}
 
 	@media (hover: hover) {
 		.dog-card:hover {
 			transform: translateY(-0.25rem);
+			box-shadow: 0 1.25rem 2.5rem rgb(122 63 22 / 0.35);
 		}
 
 		.dog-card:focus-visible {

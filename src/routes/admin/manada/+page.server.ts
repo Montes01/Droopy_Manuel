@@ -59,7 +59,8 @@ function readDogForm(form: FormData): DogInput {
 	if (form.has('name')) input.name = text('name');
 	if (form.has('breed')) input.breed = text('breed');
 	if (form.has('birthDate')) input.birthDate = text('birthDate') ?? null;
-	if (form.has('isApprox')) input.isApprox = bool('isApprox');
+	// Checkbox sin marcar no viene en FormData → hay que leerlo explícitamente.
+	input.isApprox = bool('isApprox');
 	if (form.has('sex')) input.sex = text('sex') as DogInput['sex'];
 	if (form.has('size')) input.size = text('size') as DogInput['size'];
 	if (form.has('energy')) input.energy = text('energy') as DogInput['energy'];

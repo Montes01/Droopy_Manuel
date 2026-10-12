@@ -4,6 +4,7 @@ import { serverApi } from '#lib/api/server';
 import type {
 	BankAccount,
 	ContactChannel,
+	Dog,
 	DonationTier,
 	SiteContact,
 	SiteContent,
@@ -28,7 +29,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		}
 	}
 
-	const [content, contact, tiers, testimonials, accounts] = await Promise.all([
+	const [content, contact, tiers, testimonials, accounts, dogs] = await Promise.all([
 		safe(() => serverApi.get<SiteContent>('/api/site/content', cookies), {
 			aboutBlurb: '',
 			stats: { rescued: 0, adopted: 0, sterilized: 0, inCare: 0 }
@@ -42,10 +43,11 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		}),
 		safe(() => serverApi.get<DonationTier[]>('/api/site/donation-tiers', cookies), []),
 		safe(() => serverApi.get<Testimonial[]>('/api/site/testimonials', cookies), []),
-		safe(() => serverApi.get<BankAccount[]>('/api/site/bank-accounts', cookies), [])
+		safe(() => serverApi.get<BankAccount[]>('/api/site/bank-accounts', cookies), []),
+		safe(() => serverApi.get<Dog[]>('/api/dogs', cookies), [])
 	]);
 
-	return { content, contact, tiers, testimonials, accounts };
+	return { content, contact, tiers, testimonials, accounts, dogs };
 };
 
 function text(value: FormDataEntryValue | null): string | undefined {

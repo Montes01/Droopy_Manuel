@@ -357,7 +357,15 @@
 								<label>Nombre *<input name="name" value={testimonial.name} required /></label>
 								<label>Rol *<input name="role" value={testimonial.role} required /></label>
 								<label class="wide">Cita *<textarea name="quote" rows="3" required>{testimonial.quote}</textarea></label>
-								<label>Perrito (slug)<input name="dog" value={testimonial.dog ?? ''} /></label>
+								<label>
+									Perrito (opcional)
+									<select name="dog" value={testimonial.dog ?? ''}>
+										<option value="">— Sin perrito —</option>
+										{#each data.dogs as dog (dog.slug)}
+											<option value={dog.slug}>{dog.name} ({dog.slug})</option>
+										{/each}
+									</select>
+								</label>
 							</div>
 							<div class="actions">
 								<button class="primary small" type="submit">Guardar</button>
@@ -399,7 +407,15 @@
 				<label>Nombre *<input name="name" required /></label>
 				<label>Rol *<input name="role" required /></label>
 				<label class="wide">Cita *<textarea name="quote" rows="3" required></textarea></label>
-				<label>Perrito (slug, opcional)<input name="dog" placeholder="toby" /></label>
+				<label>
+					Perrito (opcional)
+					<select name="dog">
+						<option value="">— Sin perrito —</option>
+						{#each data.dogs as dog (dog.slug)}
+							<option value={dog.slug}>{dog.name} ({dog.slug})</option>
+						{/each}
+					</select>
+				</label>
 			</div>
 			<button class="primary" type="submit">Agregar</button>
 		</form>

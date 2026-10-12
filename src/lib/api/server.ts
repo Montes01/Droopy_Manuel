@@ -1,3 +1,4 @@
+import { PUBLIC_API_URL } from '$app/env/public';
 import type { Cookies } from '@sveltejs/kit';
 import { ApiRequestError } from './client';
 
@@ -15,7 +16,7 @@ import { ApiRequestError } from './client';
 const FALLBACK_DEV_URL = 'http://localhost:3100';
 
 function baseUrl(): string {
-	const fromEnv = import.meta.env.PUBLIC_API_URL as string | undefined;
+	const fromEnv = PUBLIC_API_URL as string | undefined;
 	return fromEnv && fromEnv.trim() !== '' ? fromEnv.replace(/\/+$/, '') : FALLBACK_DEV_URL;
 }
 

@@ -1,3 +1,5 @@
+import { PUBLIC_API_URL } from '$app/env/public';
+
 /**
  * Cliente HTTP base de la API de Droopy Manuel.
  *
@@ -8,7 +10,7 @@
 const FALLBACK_DEV_URL = 'http://localhost:3100';
 
 function resolveBaseUrl(): string {
-	const fromEnv = import.meta.env.PUBLIC_API_URL as string | undefined;
+	const fromEnv = PUBLIC_API_URL as string | undefined;
 
 	if (fromEnv && fromEnv.trim() !== '') {
 		return fromEnv.replace(/\/+$/, '');

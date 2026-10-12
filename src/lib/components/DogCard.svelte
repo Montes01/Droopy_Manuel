@@ -22,9 +22,17 @@
 	};
 
 	let meta = $derived(statusMeta[display]);
+
+	/** Color principal del perrito; ausente = marrón de la marca. */
+	let accent = $derived(dog.color ?? '#7a3f16');
 </script>
 
-<button type="button" class="dog-card status-{display}" onclick={() => onselect(dog)}>
+<button
+	type="button"
+	class="dog-card status-{display}"
+	style="--dog: {accent}"
+	onclick={() => onselect(dog)}
+>
 	<span class="dog-photo" class:no-photo={!dog.photo} aria-hidden="true">
 		{#if dog.photo}
 			<img src={dog.photo} alt="" loading="lazy" decoding="async" />
@@ -44,6 +52,7 @@
 
 <style>
 	.dog-card {
+		--dog: #7a3f16;
 		position: relative;
 		display: block;
 		width: 100%;
@@ -51,7 +60,9 @@
 		overflow: visible;
 		border-radius: 0.25rem;
 		border: 1px solid rgb(122 63 22 / 0.18);
+		border-color: color-mix(in srgb, var(--dog) 25%, white);
 		background: #fffdf8;
+		background: color-mix(in srgb, var(--dog) 20%, white);
 		box-shadow: 0 0.75rem 1.75rem rgb(122 63 22 / 0.28);
 		font: inherit;
 		color: inherit;
@@ -62,7 +73,7 @@
 			box-shadow 0.25s ease;
 	}
 
-	/* Cinta adhesiva: la foto está pegada, no flotando. */
+	/* Cinta adhesiva en el color del perrito: la foto está pegada, no flotando. */
 	.dog-card::before {
 		content: '';
 		position: absolute;
@@ -72,6 +83,7 @@
 		height: 1.4rem;
 		transform: translateX(-50%) rotate(-3deg);
 		background: rgb(233 213 168 / 0.9);
+		background: color-mix(in srgb, var(--dog) 35%, #fffdf8);
 		border-left: 1px dashed rgb(122 63 22 / 0.25);
 		border-right: 1px dashed rgb(122 63 22 / 0.25);
 		box-shadow: 0 2px 5px rgb(0 0 0 / 0.15);
@@ -157,7 +169,7 @@
 		font-family: var(--font-brand);
 		font-size: 1.9rem;
 		line-height: 1.1;
-		color: #7a3f16;
+		color: var(--dog);
 	}
 
 	.dog-age {

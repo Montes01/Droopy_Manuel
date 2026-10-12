@@ -139,6 +139,23 @@
 					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="manada" />
 				{/key}
 
+				<label>
+					Color principal (opcional)
+					<span class="color-row">
+						<input
+							type="color"
+							value={editing?.color ?? '#7a3f16'}
+							aria-label="Elegir color"
+							oninput={(event) => {
+								const picker = event.currentTarget;
+								const text = picker.nextElementSibling as HTMLInputElement | null;
+								if (text) text.value = picker.value;
+							}}
+						/>
+						<input type="hidden" name="color" value={editing?.color ?? ''} />
+					</span>
+				</label>
+
 				<label class="wide">
 					Rasgos (separados por coma)
 					<input
@@ -369,6 +386,19 @@
 		border-radius: 0.375rem;
 		font: inherit;
 		font-weight: 400;
+	}
+
+	.color-row {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+	}
+
+	.color-row input[type='color'] {
+		width: 2.5rem;
+		height: 2.5rem;
+		padding: 0.125rem;
+		cursor: pointer;
 	}
 
 	fieldset {

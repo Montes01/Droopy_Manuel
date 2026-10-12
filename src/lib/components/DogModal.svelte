@@ -10,6 +10,9 @@
 
 	let closing = $state(false);
 
+	/** Color principal del perrito; ausente = marrón de la marca. */
+	let accent = $derived(dog?.color ?? '#7a3f16');
+
 	$effect(() => {
 		if (dog) closing = false;
 	});
@@ -33,7 +36,7 @@
 
 {#if dog}
 	<div class="backdrop" class:closing onclick={onbackdrop} role="presentation">
-		<div class="modal glass" role="dialog" aria-modal="true" aria-label={dog.name}>
+		<div class="modal glass" role="dialog" aria-modal="true" aria-label={dog.name} style="--dog: {accent}">
 			<div class="modal-photo" class:no-photo={!dog.photo} aria-hidden="true">
 				{#if dog.photo}
 					<img src={dog.photo} alt="" />
@@ -103,15 +106,31 @@
 	}
 
 	.modal {
+		--dog: #7a3f16;
 		width: 100%;
 		max-width: 34rem;
 		max-height: 88dvh;
 		overflow-y: auto;
 		border-radius: 1.5rem;
 		background: #ffffff;
-		border: 1px solid rgb(0 0 0 / 0.08);
+		background: color-mix(in srgb, var(--dog) 20%, white);
+		border: 3px solid var(--dog);
 		box-shadow: 0 2rem 4rem rgb(0 0 0 / 0.3);
+		scrollbar-color: var(--dog) transparent;
 		animation: sheet-up 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+	}
+
+	.modal::-webkit-scrollbar {
+		width: 0.625rem;
+	}
+
+	.modal::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.modal::-webkit-scrollbar-thumb {
+		background: var(--dog);
+		border-radius: 999px;
 	}
 
 	@keyframes backdrop-in {
@@ -155,7 +174,7 @@
 		justify-content: center;
 		width: 100%;
 		height: 320px;
-		margin: 1.25rem auto 0;
+		margin: 0 auto;
 		overflow: hidden;
 		background: #000;
 	}
@@ -232,6 +251,7 @@
 		font-size: 1rem;
 		background: rgb(122 63 22 / 0.07);
 		border: 1px solid rgb(122 63 22 / 0.12);
+		border-color: color-mix(in srgb, var(--dog) 25%, white);
 		border-radius: 0.75rem;
 		padding: 0.625rem 0.75rem;
 	}

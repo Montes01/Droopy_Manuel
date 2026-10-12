@@ -42,6 +42,11 @@ export interface Dog {
 	/** Ruta en /static cuando haya foto real. Null = avatar con inicial. */
 	photo: PhotoPath;
 	featured?: boolean;
+	/**
+	 * Color principal del perrito (hex `#rrggbb`). Opcional: null o
+	 * ausente = marrón de la marca (`#7a3f16`).
+	 */
+	color?: string | null;
 }
 
 /** Vista de la manada: vivos o en el cielo. */

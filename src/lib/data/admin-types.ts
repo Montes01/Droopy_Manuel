@@ -95,6 +95,8 @@ export interface DogInput {
 	traits?: string[];
 	story?: string;
 	photo?: string | null;
+	/** Hex `#rrggbb` o null para volver al marrón. Opcional. */
+	color?: string | null;
 	featured?: boolean;
 	sortOrder?: number;
 }

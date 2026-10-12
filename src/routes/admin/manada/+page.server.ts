@@ -67,6 +67,8 @@ function readDogForm(form: FormData): DogInput {
 	if (form.has('arrival')) input.arrival = text('arrival');
 	if (form.has('story')) input.story = text('story');
 	if (form.has('photo')) input.photo = text('photo') ?? null;
+	// Color opcional: vacío = sin color (el frontend usa el marrón).
+	if (form.has('color')) input.color = text('color') ?? null;
 
 	// `goodWith` se envía como bloque: una casilla sin marcar no llega en el
 	// FormData, y eso significa `false`, no «sin cambios».

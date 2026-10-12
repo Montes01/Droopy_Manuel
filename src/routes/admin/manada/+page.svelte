@@ -197,17 +197,18 @@
 {#if data.dogs.length === 0}
 	<p class="empty">Todavía no hay perritos. Agrega el primero.</p>
 {:else}
-	<table>
-		<thead>
-			<tr>
-				<th class="num">#</th>
-				<th>Perrito</th>
-				<th>Estado</th>
-				<th>Edad</th>
-				<th>Dest.</th>
-				<th class="right">Acciones</th>
-			</tr>
-		</thead>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th class="num">#</th>
+					<th>Perrito</th>
+					<th>Estado</th>
+					<th>Edad</th>
+					<th>Dest.</th>
+					<th class="right">Acciones</th>
+				</tr>
+			</thead>
 		<tbody>
 			{#each data.dogs as dog, index (dog.slug)}
 				<tr>
@@ -270,7 +271,8 @@
 				</tr>
 			{/each}
 		</tbody>
-	</table>
+		</table>
+	</div>
 {/if}
 
 <style>
@@ -412,9 +414,6 @@
 		width: 100%;
 		border-collapse: collapse;
 		background: #fff;
-		border: 1px solid #e2e5e9;
-		border-radius: 0.625rem;
-		overflow: hidden;
 		font-size: 0.9375rem;
 	}
 
@@ -522,5 +521,19 @@
 	.icon.danger:hover {
 		border-color: #ef4444;
 		color: #b91c1c;
+	}
+
+	@media (max-width: 40rem) {
+		.editor {
+			padding: 0.875rem;
+		}
+
+		.grid {
+			grid-template-columns: 1fr;
+		}
+
+		.actions button {
+			flex: 1 1 auto;
+		}
 	}
 </style>

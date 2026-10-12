@@ -104,6 +104,46 @@
 		align-items: center;
 		gap: 0.75rem;
 		font-size: 0.875rem;
+		flex-wrap: wrap;
+	}
+
+	/* La base global (app.css) impone 44px de alto mínimo a todo
+	control. En el panel denso se respeta para acciones principales,
+	pero los iconos/chips de tabla recuperan su tamaño compacto. */
+	.panel :global(.icon),
+	.panel :global(.mini),
+	.panel :global(.chip) {
+		min-height: 0;
+	}
+
+	/* Contenedor de scroll horizontal para tablas anchas.
+	Cada página envuelve su <table> en <div class="table-wrap">. */
+	.panel :global(.table-wrap) {
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		border: 1px solid #e2e5e9;
+		border-radius: 0.625rem;
+		background: #fff;
+		max-width: 100%;
+	}
+
+	.panel :global(.table-wrap table) {
+		border: 0;
+		border-radius: 0;
+		min-width: 42rem;
+	}
+
+	.panel :global(input),
+	.panel :global(select),
+	.panel :global(textarea) {
+		max-width: 100%;
+	}
+
+	/* fieldset trae min-inline-size: min-content por defecto en el UA:
+	sin esto, la tabla de variantes (26rem) ensancha el form y el main. */
+	.panel :global(fieldset) {
+		min-width: 0;
+		min-inline-size: 0;
 	}
 
 	.who {
@@ -138,7 +178,7 @@
 
 	.columns {
 		display: grid;
-		grid-template-columns: 14rem 1fr;
+		grid-template-columns: 14rem minmax(0, 1fr);
 		align-items: start;
 		gap: 1.5rem;
 		padding: 1.5rem;
@@ -177,17 +217,42 @@
 
 	.content {
 		min-width: 0;
+		width: 100%;
+		overflow-x: clip;
 	}
 
 	@media (max-width: 48rem) {
 		.columns {
-			grid-template-columns: 1fr;
+			grid-template-columns: minmax(0, 1fr);
+			gap: 1rem;
+			padding: 1rem;
 		}
 
 		nav ul {
 			position: static;
-			grid-auto-flow: column;
+			display: flex;
+			gap: 0.375rem;
 			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+			padding-bottom: 0.25rem;
+			scrollbar-width: thin;
+		}
+
+		nav li {
+			flex: 0 0 auto;
+		}
+
+		nav a {
+			white-space: nowrap;
+		}
+
+		.topbar {
+			padding: 0.75rem 1rem;
+		}
+
+		.panel :global(.table-wrap table) {
+			min-width: 38rem;
+			font-size: 0.875rem;
 		}
 	}
 </style>

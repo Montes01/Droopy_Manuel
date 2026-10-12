@@ -278,17 +278,18 @@
 {#if visibleItems.length === 0}
 	<p class="empty">No hay productos en esta categoría.</p>
 {:else}
-	<table>
-		<thead>
-			<tr>
-				<th>Producto</th>
-				<th>Categoría</th>
-				<th>Precio</th>
-				<th>Stock</th>
-				<th>Dest.</th>
-				<th class="right">Acciones</th>
-			</tr>
-		</thead>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Producto</th>
+					<th>Categoría</th>
+					<th>Precio</th>
+					<th>Stock</th>
+					<th>Dest.</th>
+					<th class="right">Acciones</th>
+				</tr>
+			</thead>
 		<tbody>
 			{#each visibleItems as item (item.slug)}
 				<tr>
@@ -354,7 +355,8 @@
 				</tr>
 			{/each}
 		</tbody>
-	</table>
+		</table>
+	</div>
 {/if}
 
 <style>
@@ -537,6 +539,10 @@
 		padding: 0.75rem;
 		border: 1px solid #e2e5e9;
 		border-radius: 0.5rem;
+		max-width: 100%;
+		min-width: 0;
+		min-inline-size: 0;
+		overflow-x: auto;
 	}
 
 	legend {
@@ -553,6 +559,7 @@
 
 	.variants {
 		width: 100%;
+		min-width: 26rem;
 		border-collapse: collapse;
 	}
 
@@ -610,9 +617,6 @@
 		width: 100%;
 		border-collapse: collapse;
 		background: #fff;
-		border: 1px solid #e2e5e9;
-		border-radius: 0.625rem;
-		overflow: hidden;
 		font-size: 0.9375rem;
 	}
 
@@ -738,5 +742,28 @@
 	.icon.danger:hover {
 		border-color: #ef4444;
 		color: #b91c1c;
+	}
+
+	@media (max-width: 40rem) {
+		.categories,
+		.editor {
+			padding: 0.875rem;
+		}
+
+		.grid {
+			grid-template-columns: 1fr;
+		}
+
+		.cat-form input {
+			flex: 1 1 100%;
+		}
+
+		.new-cat form input {
+			flex: 1 1 100%;
+		}
+
+		.actions button {
+			flex: 1 1 auto;
+		}
 	}
 </style>

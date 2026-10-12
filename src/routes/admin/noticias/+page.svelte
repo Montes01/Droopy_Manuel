@@ -161,17 +161,18 @@
 {#if data.items.length === 0}
 	<p class="empty">Todavía no hay noticias. Escribe la primera.</p>
 {:else}
-	<table>
-		<thead>
-			<tr>
-				<th>Noticia</th>
-				<th>Categoría</th>
-				<th>Fecha</th>
-				<th>Perritos</th>
-				<th>Dest.</th>
-				<th class="right">Acciones</th>
-			</tr>
-		</thead>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th>Noticia</th>
+					<th>Categoría</th>
+					<th>Fecha</th>
+					<th>Perritos</th>
+					<th>Dest.</th>
+					<th class="right">Acciones</th>
+				</tr>
+			</thead>
 		<tbody>
 			{#each data.items as item (item.slug)}
 				<tr>
@@ -218,7 +219,8 @@
 				</tr>
 			{/each}
 		</tbody>
-	</table>
+		</table>
+	</div>
 {/if}
 
 <style>
@@ -385,9 +387,6 @@
 		width: 100%;
 		border-collapse: collapse;
 		background: #fff;
-		border: 1px solid #e2e5e9;
-		border-radius: 0.625rem;
-		overflow: hidden;
 		font-size: 0.9375rem;
 	}
 
@@ -491,5 +490,23 @@
 	.icon.danger:hover {
 		border-color: #ef4444;
 		color: #b91c1c;
+	}
+
+	@media (max-width: 40rem) {
+		.editor {
+			padding: 0.875rem;
+		}
+
+		.grid {
+			grid-template-columns: 1fr;
+		}
+
+		.name {
+			max-width: 100%;
+		}
+
+		.actions button {
+			flex: 1 1 auto;
+		}
 	}
 </style>

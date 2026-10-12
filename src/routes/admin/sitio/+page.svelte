@@ -137,16 +137,17 @@
 	{#if data.tiers.length === 0}
 		<p class="empty">No hay niveles.</p>
 	{:else}
-		<table>
-			<thead>
-				<tr>
-					<th>Estrellas</th>
-					<th>Nombre</th>
-					<th>Precio</th>
-					<th>Beneficios</th>
-					<th class="right">Acciones</th>
-				</tr>
-			</thead>
+		<div class="table-wrap">
+			<table>
+				<thead>
+					<tr>
+						<th>Estrellas</th>
+						<th>Nombre</th>
+						<th>Precio</th>
+						<th>Beneficios</th>
+						<th class="right">Acciones</th>
+					</tr>
+				</thead>
 			<tbody>
 				{#each data.tiers as tier (tier.stars)}
 					{#if editingTier === tier.stars}
@@ -231,7 +232,8 @@
 					{/if}
 				{/each}
 			</tbody>
-		</table>
+			</table>
+		</div>
 	{/if}
 
 	<details class="add">
@@ -327,16 +329,17 @@
 	{#if data.accounts.length === 0}
 		<p class="empty">No hay cuentas.</p>
 	{:else}
-		<table>
-			<thead>
-				<tr>
-					<th>Banco</th>
-					<th>Método</th>
-					<th>Titular</th>
-					<th>Datos</th>
-					<th class="right">Acciones</th>
-				</tr>
-			</thead>
+		<div class="table-wrap">
+			<table>
+				<thead>
+					<tr>
+						<th>Banco</th>
+						<th>Método</th>
+						<th>Titular</th>
+						<th>Datos</th>
+						<th class="right">Acciones</th>
+					</tr>
+				</thead>
 			<tbody>
 				{#each data.accounts as account (account.id)}
 					<tr>
@@ -371,7 +374,8 @@
 					</tr>
 				{/each}
 			</tbody>
-		</table>
+			</table>
+		</div>
 	{/if}
 
 	<details class="add">
@@ -447,7 +451,7 @@
 
 	.split {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 		gap: 1.5rem;
 	}
 
@@ -522,6 +526,7 @@
 		gap: 0.5rem;
 		padding: 0.25rem 0;
 		font-size: 0.875rem;
+		flex-wrap: wrap;
 	}
 
 	.socials a {
@@ -536,6 +541,7 @@
 
 	table {
 		width: 100%;
+		min-width: 36rem;
 		border-collapse: collapse;
 		font-size: 0.9375rem;
 	}
@@ -696,5 +702,33 @@
 		background: #f1f3f5;
 		padding: 0.0625rem 0.25rem;
 		border-radius: 0.25rem;
+		word-break: break-all;
+	}
+
+	@media (max-width: 40rem) {
+		.card {
+			padding: 0.875rem;
+		}
+
+		.split {
+			gap: 1rem;
+		}
+
+		.grid,
+		.stats-grid {
+			grid-template-columns: 1fr;
+		}
+
+		.perks {
+			max-width: none;
+		}
+
+		.actions {
+			flex-wrap: wrap;
+		}
+
+		.actions button {
+			flex: 1 1 auto;
+		}
 	}
 </style>

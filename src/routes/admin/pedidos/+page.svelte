@@ -141,46 +141,48 @@
 		{hasFilters ? 'Ningún pedido coincide con los filtros.' : 'Todavía no hay pedidos.'}
 	</p>
 {:else}
-	<table>
-		<thead>
-			<tr>
-				<th>Pedido</th>
-				<th>Cliente</th>
-				<th>Fecha</th>
-				<th>Entrega</th>
-				<th>Total</th>
-				<th>Estado</th>
-				<th>Pago</th>
-				<th class="right">Acciones</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each data.orders as order (order.orderNumber)}
+	<div class="table-wrap">
+		<table>
+			<thead>
 				<tr>
-					<td><code>{order.orderNumber}</code></td>
-					<td>
-						<strong>{order.customer.nombres} {order.customer.apellidos}</strong>
-						<span class="sub">{order.customer.email}</span>
-					</td>
-					<td class="nowrap">{formatDate(order.createdAt)}</td>
-					<td>{order.shippingLabel}</td>
-					<td class="nowrap"><strong>{formatCOP(order.totalCents)}</strong></td>
-					<td>
-						<span class="tag status-{order.status}">{statusLabels[order.status]}</span>
-					</td>
-					<td>
-						<span class="tag pay-{order.paymentStatus}">{paymentLabels[order.paymentStatus]}</span>
-					</td>
-					<td class="right">
-						<div class="row-actions">
-							<button class="icon" onclick={() => (openOrder = order)} title="Ver detalle">👁</button>
-							<button class="icon" onclick={() => copySummary(order)} title="Copiar resumen">⧉</button>
-						</div>
-					</td>
+					<th>Pedido</th>
+					<th>Cliente</th>
+					<th>Fecha</th>
+					<th>Entrega</th>
+					<th>Total</th>
+					<th>Estado</th>
+					<th>Pago</th>
+					<th class="right">Acciones</th>
 				</tr>
-			{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each data.orders as order (order.orderNumber)}
+					<tr>
+						<td><code>{order.orderNumber}</code></td>
+						<td>
+							<strong>{order.customer.nombres} {order.customer.apellidos}</strong>
+							<span class="sub">{order.customer.email}</span>
+						</td>
+						<td class="nowrap">{formatDate(order.createdAt)}</td>
+						<td>{order.shippingLabel}</td>
+						<td class="nowrap"><strong>{formatCOP(order.totalCents)}</strong></td>
+						<td>
+							<span class="tag status-{order.status}">{statusLabels[order.status]}</span>
+						</td>
+						<td>
+							<span class="tag pay-{order.paymentStatus}">{paymentLabels[order.paymentStatus]}</span>
+						</td>
+						<td class="right">
+							<div class="row-actions">
+								<button class="icon" onclick={() => (openOrder = order)} title="Ver detalle">👁</button>
+								<button class="icon" onclick={() => copySummary(order)} title="Copiar resumen">⧉</button>
+							</div>
+						</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
 {/if}
 
 {#if openOrder}
@@ -353,6 +355,14 @@
 		gap: 0.25rem;
 		font-size: 0.8125rem;
 		font-weight: 600;
+		flex: 1 1 9rem;
+		min-width: 0;
+	}
+
+	.filters input,
+	.filters select {
+		width: 100%;
+		max-width: 100%;
 	}
 
 	.filter-actions {
@@ -383,9 +393,6 @@
 		width: 100%;
 		border-collapse: collapse;
 		background: #fff;
-		border: 1px solid #e2e5e9;
-		border-radius: 0.625rem;
-		overflow: hidden;
 		font-size: 0.9375rem;
 	}
 
@@ -619,5 +626,23 @@
 		font-size: 0.8125rem;
 		color: #5b6470;
 		line-height: 1.5;
+	}
+
+	@media (max-width: 40rem) {
+		.filters {
+			padding: 0.75rem;
+		}
+
+		.filter-actions {
+			width: 100%;
+		}
+
+		.filter-actions button {
+			flex: 1 1 auto;
+		}
+
+		.drawer {
+			padding: 1rem;
+		}
 	}
 </style>

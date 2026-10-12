@@ -210,11 +210,13 @@
 		font-size: 2.25rem;
 		line-height: 1.1;
 		color: #7a3f16;
+		text-align: center;
 	}
 
 	.modal-sub {
 		opacity: 0.8;
 		margin-bottom: 1rem;
+		text-align: center;
 	}
 
 	.facts {
@@ -228,6 +230,10 @@
 		grid-template-columns: 7rem 1fr;
 		gap: 0.5rem;
 		font-size: 1rem;
+		background: rgb(122 63 22 / 0.07);
+		border: 1px solid rgb(122 63 22 / 0.12);
+		border-radius: 0.75rem;
+		padding: 0.625rem 0.75rem;
 	}
 
 	.facts dt {
@@ -239,15 +245,16 @@
 		list-style: none;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 0.375rem;
+		justify-content: center;
+		gap: 0.5rem;
 		margin-bottom: 1rem;
 	}
 
 	.chips li {
-		font-size: 0.875rem;
+		font-size: 1rem;
 		background: rgb(255 255 255 / 0.7);
 		border: 1px solid rgb(0 0 0 / 0.08);
-		padding: 0.125rem 0.625rem;
+		padding: 0.375rem 0.875rem;
 		border-radius: 999px;
 	}
 

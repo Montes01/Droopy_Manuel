@@ -1,4 +1,3 @@
-import { PUBLIC_API_URL } from '$app/env/public';
 import { redirect } from '@sveltejs/kit';
 import { serverGet } from '#lib/api/server';
 import type { Dog, NewsItem, OrderPage, ShopItem } from '#lib/data/admin-types';
@@ -52,7 +51,7 @@ export const actions: Actions = {
 
 		if (token) {
 			try {
-				const base = PUBLIC_API_URL ?? 'http://localhost:3100';
+				const base = import.meta.env.VITE_API_URL ?? 'http://localhost:3100';
 				await fetch(`${base}/api/auth/logout`, {
 					method: 'POST',
 					headers: { Cookie: `dm_session=${token}` }

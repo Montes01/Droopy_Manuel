@@ -1,23 +1,21 @@
-import { PUBLIC_API_URL } from '$app/env/public';
-
 /**
  * Cliente HTTP base de la API de Droopy Manuel.
  *
- * La URL del backend se configura con `PUBLIC_API_URL`. Si no se define,
- * en desarrollo apuntamos al servidor local del backend.
+ * La URL del backend se configura con `VITE_API_URL` (ver `.env.example`).
+ * Vite la incrusta en el build; si no se define, hablamos con el server local.
  */
 
 const FALLBACK_DEV_URL = 'http://localhost:3100';
 
 function resolveBaseUrl(): string {
-	const fromEnv = PUBLIC_API_URL as string | undefined;
+	const fromEnv = import.meta.env.VITE_API_URL as string | undefined;
 
 	if (fromEnv && fromEnv.trim() !== '') {
 		return fromEnv.replace(/\/+$/, '');
 	}
 
 	// Sin variable de entorno, hablamos con el server local. En producción
-	// conviene definir PUBLIC_API_URL (ver README).
+	// conviene definir VITE_API_URL (ver README).
 	return FALLBACK_DEV_URL;
 }
 

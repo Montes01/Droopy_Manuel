@@ -12,4 +12,13 @@ declare global {
 	}
 }
 
+interface ImportMetaEnv {
+	/** URL base del backend, ej. http://localhost:3100 */
+	readonly VITE_API_URL?: string;
+}
+
+interface ImportMeta {
+	readonly env: ImportMetaEnv;
+}
+
 export {};

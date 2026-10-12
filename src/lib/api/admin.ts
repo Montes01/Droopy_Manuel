@@ -209,6 +209,14 @@ export async function updateContactChannel(
 	return api.patch(`/api/admin/site/contact/${encodeURIComponent(key)}`, input);
 }
 
+export async function createContactChannel(input: ContactChannelInput): Promise<unknown> {
+	return api.post('/api/admin/site/contact', input);
+}
+
+export async function deleteContactChannel(key: string): Promise<void> {
+	await api.delete(`/api/admin/site/contact/${encodeURIComponent(key)}`);
+}
+
 export async function createDonationTier(input: DonationTierInput): Promise<DonationTier> {
 	return api.post<DonationTier>('/api/admin/site/donation-tiers', input);
 }

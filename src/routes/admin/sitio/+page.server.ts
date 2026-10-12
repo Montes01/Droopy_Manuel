@@ -162,6 +162,62 @@ export const actions: Actions = {
 		}
 	},
 
+	/** Agrega una red social (Instagram, TikTok…). */
+	createSocial: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const label = text(form.get('label'));
+		const href = text(form.get('href'));
+		const icon = text(form.get('icon'));
+
+		if (!label) return fail(400, { error: 'La red necesita un nombre.' });
+		if (!href) return fail(400, { error: 'La red necesita su enlace.' });
+
+		try {
+			await serverApi.post('/api/admin/site/contact', cookies, {
+				label,
+				href,
+				...(icon ? { icon } : {})
+			});
+			return { success: true, message: `Red ${label} agregada.` };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo agregar la red.') });
+		}
+	},
+
+	/** Edita el nombre, enlace o icono de una red social. */
+	updateSocial: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const key = text(form.get('key'));
+		if (!key) return fail(400, { error: 'Falta la red a editar.' });
+
+		const input = {
+			label: text(form.get('label')),
+			href: text(form.get('href')),
+			icon: text(form.get('icon'))
+		};
+
+		try {
+			await serverApi.patch(`/api/admin/site/contact/${encodeURIComponent(key)}`, cookies, input);
+			return { success: true, message: 'Red actualizada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo actualizar la red.') });
+		}
+	},
+
+	/** Quita una red social. Solo `admin` (el backend lo exige). */
+	deleteSocial: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const key = text(form.get('key'));
+		if (!key) return fail(400, { error: 'Falta la red a borrar.' });
+
+		try {
+			await serverApi.delete(`/api/admin/site/contact/${encodeURIComponent(key)}`, cookies);
+			return { success: true, message: 'Red eliminada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo borrar la red.') });
+		}
+	},
+
 	// ---------------------------------------------------- Niveles de donación
 
 	createTier: async ({ request, cookies }) => {

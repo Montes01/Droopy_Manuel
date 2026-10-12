@@ -282,6 +282,8 @@ export interface SiteContent {
 
 /** Una red social o canal de contacto, con su icono. */
 export interface ContactChannel {
+	/** Identificador: whatsapp, instagram… */
+	key: string;
 	label: string;
 	/** Icono en /static, ej. /icons/whatsapp.png */
 	icon: string;

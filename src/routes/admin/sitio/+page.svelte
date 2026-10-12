@@ -6,6 +6,19 @@
 
 	let editingTier = $state<number | null>(null);
 	let editingTestimonial = $state<number | null>(null);
+	let editingSocial = $state<string | null>(null);
+
+	/** Redes gestionables: WhatsApp se edita desde su número, no aquí. */
+	const socials = $derived((data.contact.socials ?? []).filter((s) => s.key !== 'whatsapp'));
+
+	/** Iconos disponibles en /static/icons. */
+	const knownIcons = [
+		'/icons/instagram.png',
+		'/icons/tiktok.png',
+		'/icons/facebook.png',
+		'/icons/youtube.png',
+		'/icons/whatsapp.png'
+	];
 
 	const methodLabels: Record<string, string> = {
 		transferencia: 'Transferencia',
@@ -78,18 +91,89 @@
 		</form>
 	</div>
 
-	{#if data.contact.socials.length > 0}
+	{#if socials.length > 0}
 		<h3>Redes</h3>
 		<ul class="socials">
-			{#each data.contact.socials as social (social.label)}
+			{#each socials as social (social.key)}
 				<li>
-					<img src={social.icon} alt="" width="18" height="18" />
-					<span>{social.label}</span>
-					<a href={social.href} target="_blank" rel="noreferrer">{social.href}</a>
+					{#if editingSocial === social.key}
+						<form
+							class="social-edit"
+							method="POST"
+							action="?/updateSocial"
+							use:enhance={() => {
+								return async ({ update }) => {
+									await update();
+									editingSocial = null;
+								};
+							}}
+						>
+							<input type="hidden" name="key" value={social.key} />
+							<div class="grid">
+								<label>Nombre *<input name="label" value={social.label} required /></label>
+								<label class="wide">Enlace *<input name="href" value={social.href} required /></label>
+								<label class="wide">
+									Icono
+									<input name="icon" value={social.icon} list="social-icons" />
+								</label>
+							</div>
+							<div class="actions">
+								<button class="primary small" type="submit">Guardar</button>
+								<button
+									class="ghost small"
+									type="button"
+									onclick={() => (editingSocial = null)}
+								>
+									Cancelar
+								</button>
+							</div>
+						</form>
+					{:else}
+						<img src={social.icon} alt="" width="18" height="18" />
+						<span>{social.label}</span>
+						<a href={social.href} target="_blank" rel="noreferrer">{social.href}</a>
+						<div class="row-actions">
+							<button class="icon" onclick={() => (editingSocial = social.key)} title="Editar">✎</button>
+							<form method="POST" action="?/deleteSocial" use:enhance>
+								<input type="hidden" name="key" value={social.key} />
+								<button
+									class="icon danger"
+									type="submit"
+									title="Borrar"
+									onclick={(event) => {
+										if (!confirm(`¿Borrar la red ${social.label}?`)) event.preventDefault();
+									}}
+								>
+									🗑
+								</button>
+							</form>
+						</div>
+					{/if}
 				</li>
 			{/each}
 		</ul>
 	{/if}
+
+	<details class="add">
+		<summary>Agregar red</summary>
+		<form method="POST" action="?/createSocial" use:enhance>
+			<div class="grid">
+				<label>Nombre *<input name="label" placeholder="Instagram" required /></label>
+				<label class="wide">Enlace *<input name="href" placeholder="https://instagram.com/…" required /></label>
+				<label class="wide">
+					Icono (opcional)
+					<input name="icon" placeholder="/icons/instagram.png" list="social-icons" />
+				</label>
+			</div>
+			<p class="hint">Si no indicas icono se usa <code>/icons/&lt;nombre&gt;.png</code>.</p>
+			<button class="primary" type="submit">Agregar red</button>
+		</form>
+	</details>
+	<datalist id="social-icons">
+		{#each knownIcons as icon}
+			<option value={icon}></option>
+		{/each}
+	</datalist>
 </section>
 
 <!-- --------------------------------------------------------- Sobre nosotros -->
@@ -601,6 +685,10 @@
 
 	.tier-edit {
 		padding: 0.25rem 0;
+	}
+
+	.social-edit {
+		flex: 1 1 100%;
 	}
 
 	.testimonials {

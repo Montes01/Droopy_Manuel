@@ -87,13 +87,13 @@
 
 				<label>
 					Fecha de nacimiento
-					<input name="birthDate" type="date" />
+					<input name="birthDate" type="date" value={editing?.birthDate ?? ''} />
 				</label>
 
 				<label>
 					Aproximada
 					<div class="switch">
-						<input name="isApprox" type="checkbox" class="switch-input" />
+						<input name="isApprox" type="checkbox" class="switch-input" checked={editing?.isApprox ?? false} />
 						<span class="switch-slider"></span>
 					</div>
 				</label>

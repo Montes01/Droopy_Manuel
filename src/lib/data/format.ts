@@ -8,6 +8,11 @@ import type { Cents, ISODate, ShopItem, ShopVariant } from './types';
  * API (`#lib/api/shop`), no de este módulo.
  */
 
+/** Formatea centavos en pesos colombianos: 4500000 → "$45.000". */
+export function formatCOP(cents: Cents): string {
+	return '$' + Math.round(cents / 100).toLocaleString('es-CO');
+}
+
 /** Formatea la edad de un perro a partir de su fecha de nacimiento y bandera approx. */
 export function formatDogAge(birthDate: ISODate | null, isApprox: boolean): string {
 	if (!birthDate) return 'Desconocida';

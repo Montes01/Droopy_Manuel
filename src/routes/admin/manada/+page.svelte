@@ -440,8 +440,16 @@
 		cursor: pointer;
 	}
 
+	.table-wrap {
+		overflow-x: auto;
+		border: 1px solid #e2e5e9;
+		border-radius: 0.625rem;
+		background: #fff;
+	}
+
 	table {
 		width: 100%;
+		min-width: 42rem;
 		border-collapse: collapse;
 		background: #fff;
 		font-size: 0.9375rem;

@@ -225,6 +225,7 @@
 
 	/* La inclinación va inline por perrito (ver tiltFor). */
 	.print {
+		min-width: 0;
 		will-change: transform;
 	}
 

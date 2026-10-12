@@ -188,4 +188,19 @@
 			outline-offset: 2px;
 		}
 	}
+
+	/* Solo móvil: la foto llena el marco sin poder ensanchar la lista. */
+	@media (max-width: 40rem) {
+		.dog-photo {
+			height: 18rem;
+		}
+
+		.dog-photo img {
+			width: 100%;
+			max-width: 100%;
+			height: 100%;
+			object-fit: cover;
+			object-position: center top;
+		}
+	}
 </style>

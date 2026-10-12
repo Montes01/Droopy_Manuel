@@ -201,10 +201,6 @@
 					<input name="emoji" value={editing?.emoji ?? ''} placeholder="🍖" />
 				</label>
 
-				{#key editing?.slug ?? 'nuevo'}
-					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="tienda" />
-				{/key}
-
 				<label>
 					Stock (si no tiene variantes)
 					<input name="stock" type="number" min="0" value={editing?.stock ?? 0} />
@@ -225,6 +221,12 @@
 					<textarea name="details" rows="3" required>{editing?.details ?? ''}</textarea>
 				</label>
 			</div>
+
+			{#key editing?.slug ?? 'nuevo'}
+				<div class="image-upload-wrapper">
+					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="tienda" />
+				</div>
+			{/key}
 
 			<fieldset>
 				<legend>Variantes (talla, color…)</legend>
@@ -559,6 +561,10 @@
 		margin: 0 0 0.5rem;
 		font-size: 0.8125rem;
 		color: #5b6470;
+	}
+
+	.image-upload-wrapper {
+		margin: 1.5rem 0;
 	}
 
 	.variants {

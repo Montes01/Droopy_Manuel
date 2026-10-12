@@ -3,6 +3,7 @@
 	import type { ActionData, PageData } from './$types';
 	import ImageUpload from '#lib/components/ImageUpload.svelte';
 	import type { Dog } from '#lib/data/admin-types';
+	import { formatDogAge } from '#lib/data/format';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -85,13 +86,16 @@
 				</label>
 
 				<label>
-					Edad (años) *
-					<input name="ageYears" type="number" min="0" value={editing?.ageYears ?? ''} required />
+					Fecha de nacimiento *
+					<input name="birthDate" type="date" required />
 				</label>
 
 				<label>
-					Edad como se muestra *
-					<input name="ageLabel" value={editing?.ageLabel ?? ''} placeholder="Ej. 10 meses" required />
+					Aproximada
+					<div class="switch">
+						<input name="isApprox" type="checkbox" class="switch-input" />
+						<span class="switch-slider"></span>
+					</div>
 				</label>
 
 				<label>
@@ -134,27 +138,30 @@
 					Llegada *
 					<input name="arrival" type="date" value={editing?.arrival ?? ''} required />
 				</label>
+			</div>
 
-				{#key editing?.slug ?? 'nuevo'}
+			{#key editing?.slug ?? 'nuevo'}
+				<div class="image-upload-wrapper">
 					<ImageUpload name="photo" value={editing?.photo ?? ''} folder="manada" />
-				{/key}
+				</div>
+			{/key}
 
-				<label>
-					Color principal (opcional)
-					<span class="color-row">
-						<input
-							type="color"
-							value={editing?.color ?? '#7a3f16'}
-							aria-label="Elegir color"
-							oninput={(event) => {
-								const picker = event.currentTarget;
-								const text = picker.nextElementSibling as HTMLInputElement | null;
-								if (text) text.value = picker.value;
-							}}
-						/>
-						<input type="hidden" name="color" value={editing?.color ?? ''} />
-					</span>
-				</label>
+			<label>
+				Color principal (opcional)
+				<span class="color-row">
+					<input
+						type="color"
+						value={editing?.color ?? '#7a3f16'}
+						aria-label="Elegir color"
+						oninput={(event) => {
+							const picker = event.currentTarget;
+							const text = picker.nextElementSibling as HTMLInputElement | null;
+							if (text) text.value = picker.value;
+						}}
+					/>
+					<input type="hidden" name="color" value={editing?.color ?? ''} />
+				</span>
+			</label>
 
 				<label class="wide">
 					Rasgos (separados por coma)
@@ -169,7 +176,6 @@
 					Historia *
 					<textarea name="story" rows="4" required>{editing?.story ?? ''}</textarea>
 				</label>
-			</div>
 
 			<fieldset>
 				<legend>Se lleva bien con</legend>
@@ -244,7 +250,7 @@
 						</span>
 					</td>
 					<td><span class="tag">{statusLabels[dog.status] ?? dog.status}</span></td>
-					<td>{dog.ageLabel}</td>
+					<td>{formatDogAge(dog.birthDate, dog.isApprox)}</td>
 					<td>{dog.featured ? '★' : ''}</td>
 					<td class="right">
 						<div class="row-actions">
@@ -399,6 +405,66 @@
 		height: 2.5rem;
 		padding: 0.125rem;
 		cursor: pointer;
+	}
+
+	/* Toggle switch para "Aproximada" */
+	.switch {
+		position: relative;
+		width: 3rem;
+		height: 1.75rem;
+		flex-shrink: 0;
+		margin-top: 0.25rem;
+	}
+
+	.image-upload-wrapper {
+		margin: 1.5rem 0;
+	}
+
+	.switch-input {
+		opacity: 0;
+		width: 0;
+		height: 0;
+		position: absolute;
+	}
+
+	.switch-slider {
+		position: absolute;
+		inset: 0;
+		background-color: #ccd2d9;
+		border-radius: 1.75rem;
+		transition: background-color 0.2s ease;
+		cursor: pointer;
+	}
+
+	.switch-slider::before {
+		content: '';
+		position: absolute;
+		width: 1.375rem;
+		height: 1.375rem;
+		border-radius: 50%;
+		background-color: white;
+		top: 0.1875rem;
+		left: 0.1875rem;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+		transition: transform 0.2s ease;
+	}
+
+	.switch-input:checked + .switch-slider {
+		background-color: #7a3f16;
+	}
+
+	.switch-input:checked + .switch-slider::before {
+		transform: translateX(1.25rem);
+	}
+
+	.switch-input:focus-visible + .switch-slider {
+		outline: 3px solid #7a3f16;
+		outline-offset: 2px;
+	}
+
+	.switch-input:disabled + .switch-slider {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 
 	fieldset {

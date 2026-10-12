@@ -82,8 +82,8 @@ export interface DogInput {
 	slug?: string;
 	name?: string;
 	breed?: string;
-	ageYears?: number;
-	ageLabel?: string;
+	birthDate?: string | null; // YYYY-MM-DD, null = desconocido
+	isApprox?: boolean;        // true = fundación estima
 	sex?: Dog['sex'];
 	size?: Dog['size'];
 	energy?: Dog['energy'];

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Dog } from '#lib/data/types';
+	import { formatDogAge } from '#lib/data/format';
 
 	interface Props {
 		open: boolean;
@@ -66,7 +67,7 @@
 							</span>
 							<span class="dog-text">
 								<span class="dog-name">{dog.name}</span>
-								<span class="dog-meta">{dog.breed} · {dog.ageLabel}</span>
+								<span class="dog-meta">{dog.breed} · {formatDogAge(dog.birthDate, dog.isApprox)}</span>
 							</span>
 							<span class="dog-star" aria-hidden="true">{selectedSlug === dog.slug ? '⭐' : '☆'}</span>
 						</button>

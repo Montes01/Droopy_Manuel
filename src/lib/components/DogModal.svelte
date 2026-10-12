@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Dog } from '#lib/data/types';
+	import { formatDogAge } from '#lib/data/format';
 
 	interface Props {
 		dog: Dog | null;
@@ -47,7 +48,7 @@
 			</div>
 			<div class="modal-body">
 				<h3>{dog.name}</h3>
-				<p class="modal-sub">{dog.breed} · {dog.ageLabel} · {dog.sex}</p>
+				<p class="modal-sub">{dog.breed} · {formatDogAge(dog.birthDate, dog.isApprox)} · {dog.sex}</p>
 
 				<dl class="facts">
 					<div>

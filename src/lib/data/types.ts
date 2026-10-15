@@ -12,7 +12,22 @@ export type PhotoPath = string | null;
 
 // ---------------------------------------------------------------- Perritos
 
-export type DogStatus = 'en-adopcion' | 'hogar-temporal' | 'adoptado' | 'en-memoria';
+/**
+ * Todos los estados posibles de un perrito.
+ *
+ * Copia de `Server/src/types.ts` (DOG_STATUSES): si cambia allí, cámbialo
+ * aquí. Etiquetas y presentación viven en `./dog-status`; no los dupliques
+ * en componentes o páginas.
+ */
+export const DOG_STATUSES = [
+	'en-adopcion',
+	'hogar-temporal',
+	'adoptado',
+	'comunitario',
+	'en-memoria'
+] as const;
+
+export type DogStatus = (typeof DOG_STATUSES)[number];
 export type DogSize = 'pequeño' | 'mediano' | 'grande';
 export type DogSex = 'macho' | 'hembra';
 export type DogEnergy = 'tranquilo' | 'moderado' | 'juguetón';

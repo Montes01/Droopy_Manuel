@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Dog } from '#lib/data/types';
+	import { dogDisplayMeta, getDogDisplayStatus } from '#lib/data/dog-status';
 	import { formatDogAge } from '#lib/data/format';
 
 	interface Props {
@@ -9,20 +10,9 @@
 
 	let { dog, onselect }: Props = $props();
 
-	type DisplayStatus = 'home' | 'pending' | 'lost';
+	let display = $derived(getDogDisplayStatus(dog.status));
 
-	/** Los demás datos del perro se conservan, solo se ocultan de la UI. */
-	let display: DisplayStatus = $derived(
-		dog.status === 'adoptado' ? 'home' : dog.status === 'en-memoria' ? 'lost' : 'pending'
-	);
-
-	const statusMeta: Record<DisplayStatus, { label: string; emoji: string }> = {
-		home: { label: 'Con hogar', emoji: '🏠' },
-		pending: { label: 'Buscando hogar', emoji: '⏳' },
-		lost: { label: 'Perdido', emoji: '🌈' }
-	};
-
-	let meta = $derived(statusMeta[display]);
+	let meta = $derived(dogDisplayMeta[display]);
 
 	/** Color principal del perrito; ausente = marrón de la marca. */
 	let accent = $derived(dog.color ?? '#7a3f16');
@@ -152,6 +142,10 @@
 
 	.status-pending .status-pill {
 		background: #b7791f;
+	}
+
+	.status-community .status-pill {
+		background: #0277bd;
 	}
 
 	.status-lost .status-pill {

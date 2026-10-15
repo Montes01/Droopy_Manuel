@@ -3,6 +3,7 @@
 	import type { ActionData, PageData } from './$types';
 	import ImageUpload from '#lib/components/ImageUpload.svelte';
 	import type { Dog } from '#lib/data/admin-types';
+	import { DOG_STATUSES, dogStatusLabels } from '#lib/data/dog-status';
 	import { formatDogAge } from '#lib/data/format';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -28,13 +29,6 @@
 		showForm = false;
 		editing = null;
 	}
-
-	const statusLabels: Record<string, string> = {
-		'en-adopcion': 'En adopción',
-		'hogar-temporal': 'Hogar temporal',
-		adoptado: 'Adoptado',
-		'en-memoria': 'En memoria'
-	};
 </script>
 
 <svelte:head>
@@ -127,9 +121,9 @@
 
 				<label>
 					Estado *
-					<select name="status" value={editing?.status ?? 'en-adopcion'}>
+					<select name="status" value={editing?.status ?? DOG_STATUSES[0]}>
 						{#each data.options.statuses as option (option)}
-							<option value={option}>{statusLabels[option] ?? option}</option>
+							<option value={option}>{dogStatusLabels[option] ?? option}</option>
 						{/each}
 					</select>
 				</label>
@@ -249,7 +243,7 @@
 							<span class="sub">{dog.breed} · <code>{dog.slug}</code></span>
 						</span>
 					</td>
-					<td><span class="tag">{statusLabels[dog.status] ?? dog.status}</span></td>
+					<td><span class="tag">{dogStatusLabels[dog.status] ?? dog.status}</span></td>
 					<td>{formatDogAge(dog.birthDate, dog.isApprox)}</td>
 					<td>{dog.featured ? '★' : ''}</td>
 					<td class="right">

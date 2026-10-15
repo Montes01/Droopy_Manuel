@@ -3,6 +3,7 @@ import { ApiRequestError } from '#lib/api/client';
 import { serverApi } from '#lib/api/server';
 import type { DogInput } from '#lib/data/admin-types';
 import type { Dog } from '#lib/data/types';
+import { DOG_STATUSES } from '#lib/data/types';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -23,7 +24,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 	return {
 		dogs,
 		options: {
-			statuses: ['en-adopcion', 'hogar-temporal', 'adoptado', 'en-memoria'],
+			statuses: [...DOG_STATUSES],
 			sizes: ['pequeño', 'mediano', 'grande'],
 			sexes: ['macho', 'hembra'],
 			energies: ['tranquilo', 'moderado', 'juguetón']

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Dog } from '#lib/data/types';
 	import { dogDisplayMeta, getDogDisplayStatus } from '#lib/data/dog-status';
+	import { isLightColor } from '#lib/data/color';
 	import { formatDogAge } from '#lib/data/format';
 
 	interface Props {
@@ -16,12 +17,15 @@
 
 	/** Color principal del perrito; ausente = marrón de la marca. */
 	let accent = $derived(dog.color ?? '#7a3f16');
+
+	let light = $derived(isLightColor(accent));
+	let outline = $derived(light ? '#000' : accent);
 </script>
 
 <button
 	type="button"
 	class="dog-card status-{display}"
-	style="--dog: {accent}"
+	style="--dog: {accent}; --dog-ink: {outline}"
 	onclick={() => onselect(dog)}
 >
 	<span class="dog-photo" class:no-photo={!dog.photo} aria-hidden="true">
@@ -36,7 +40,7 @@
 		{/if}
 	</span>
 	<span class="dog-body">
-		<span class="dog-name">{dog.name}</span>
+		<span class="dog-name" class:flat={!light}>{dog.name}</span>
 		<span class="dog-age">{formatDogAge(dog.birthDate, dog.isApprox)}</span>
 	</span>
 </button>
@@ -165,6 +169,16 @@
 		font-size: 1.9rem;
 		line-height: 1.1;
 		color: var(--dog);
+		text-shadow:
+			-2px -2px 0 var(--dog-ink, var(--dog)),
+			2px -2px 0 var(--dog-ink, var(--dog)),
+			-2px 2px 0 var(--dog-ink, var(--dog)),
+			2px 2px 0 var(--dog-ink, var(--dog)),
+			0 6px 20px rgb(0 0 0 / 0.6);
+	}
+
+	.dog-name.flat {
+		text-shadow: 0 6px 20px rgb(0 0 0 / 0.35);
 	}
 
 	.dog-age {

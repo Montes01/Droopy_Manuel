@@ -222,8 +222,23 @@ export interface Order extends OrderResult {
 
 // ---------------------------------------------------------------- Noticias
 
+/**
+ * Categorías de noticias. Copia de `Server/src/types.ts`
+ * (NEWS_CATEGORY_SLUGS): si cambia allí, cámbialo aquí. Las etiquetas y
+ * emojis viven en `./news-labels`; no los dupliques en componentes o páginas.
+ */
+export const NEWS_CATEGORY_SLUGS = [
+	'rescate',
+	'adopcion',
+	'salud',
+	'evento',
+	'tienda',
+	'proyecto',
+	'ayudas'
+] as const;
+
 /** Categoría de una noticia. `slug` para filtros, `label` para la UI. */
-export type NewsCategory = 'rescate' | 'adopcion' | 'salud' | 'evento' | 'tienda';
+export type NewsCategory = (typeof NEWS_CATEGORY_SLUGS)[number];
 
 /** Noticia de la fundación. `slug` se usa en la ruta /noticias/[slug]. */
 export interface NewsItem {

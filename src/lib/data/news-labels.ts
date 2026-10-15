@@ -11,7 +11,9 @@ export const categoryLabels: Record<NewsCategory, string> = {
 	adopcion: 'Adopción',
 	salud: 'Salud',
 	evento: 'Evento',
-	tienda: 'Tienda'
+	tienda: 'Tienda',
+	proyecto: 'Proyecto',
+	ayudas: 'Ayudas'
 };
 
 /** Emoji de respaldo por categoría. */
@@ -20,5 +22,7 @@ export const categoryEmoji: Record<NewsCategory, string> = {
 	adopcion: '🏠',
 	salud: '💉',
 	evento: '🎉',
-	tienda: '🛍️'
+	tienda: '🛍️',
+	proyecto: '⭐',
+	ayudas: '🤝'
 };

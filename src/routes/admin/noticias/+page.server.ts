@@ -2,6 +2,7 @@ import { fail } from '@sveltejs/kit';
 import { ApiRequestError } from '#lib/api/client';
 import { serverApi } from '#lib/api/server';
 import type { Dog, NewsItem } from '#lib/data/types';
+import { NEWS_CATEGORY_SLUGS } from '#lib/data/types';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -27,7 +28,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		items,
 		// Para el selector de perritos relacionados.
 		dogs: dogs.map((dog) => ({ slug: dog.slug, name: dog.name })),
-		categories: ['rescate', 'adopcion', 'salud', 'evento', 'tienda']
+		categories: [...NEWS_CATEGORY_SLUGS]
 	};
 };
 

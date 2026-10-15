@@ -3,19 +3,19 @@
 	import type { ActionData, PageData } from './$types';
 	import ImageUpload from '#lib/components/ImageUpload.svelte';
 	import type { NewsItem } from '#lib/data/types';
+	import { categoryEmoji, categoryLabels } from '#lib/data/news-labels';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
 	let editing = $state<NewsItem | null>(null);
 	let showForm = $state(false);
 
-	const categoryLabels: Record<string, string> = {
-		rescate: '🚑 Rescate',
-		adopcion: '🏠 Adopción',
-		salud: '💉 Salud',
-		evento: '🎉 Evento',
-		tienda: '🛍️ Tienda'
-	};
+	/** Etiqueta con emoji, como se muestra en el selector y la tabla. */
+	function categoryTag(category: string): string {
+		const label = (categoryLabels as Record<string, string>)[category] ?? category;
+		const emoji = (categoryEmoji as Record<string, string>)[category];
+		return emoji ? `${emoji} ${label}` : label;
+	}
 
 	/** El cuerpo se edita como texto: un párrafo por línea. */
 	let bodyText = $derived(editing?.body.join('\n\n') ?? '');
@@ -94,7 +94,7 @@
 					Categoría *
 					<select name="category" value={editing?.category ?? 'rescate'}>
 						{#each data.categories as category (category)}
-							<option value={category}>{categoryLabels[category] ?? category}</option>
+							<option value={category}>{categoryTag(category)}</option>
 						{/each}
 					</select>
 				</label>
@@ -187,7 +187,7 @@
 							<span class="sub"><code>{item.slug}</code></span>
 						</span>
 					</td>
-					<td><span class="tag">{categoryLabels[item.category] ?? item.category}</span></td>
+					<td><span class="tag">{categoryTag(item.category)}</span></td>
 					<td>{shortDate(item.date)}</td>
 					<td>
 						{#if item.relatedDogSlugs.length > 0}

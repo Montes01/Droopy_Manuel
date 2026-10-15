@@ -74,6 +74,29 @@ export interface DonationTarget {
 	goalCents?: Cents;
 }
 
+// ------------------------------------------------------- Página de proyecto
+
+/**
+ * Clases de sección de la página `/project`. Copia de
+ * `Server/src/types.ts`: si cambia allí, cámbialo aquí.
+ */
+export const PROJECT_SECTION_KINDS = ['hero', 'chapter', 'closing'] as const;
+
+export type ProjectSectionKind = (typeof PROJECT_SECTION_KINDS)[number];
+
+/**
+ * Un bloque editable de la página `/project`, en el orden de `position`.
+ * `title` nulo = sin encabezado visible. `body` son párrafos con `**negrita**`
+ * como único formato.
+ */
+export interface ProjectSection {
+	id: number;
+	position: number;
+	kind: ProjectSectionKind;
+	title: string | null;
+	body: string[];
+}
+
 // ------------------------------------------------------------------ Tienda
 
 /** Categoría de la tienda solidaria. `slug` se usa en la ruta /tienda/[slug]. */

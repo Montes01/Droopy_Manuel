@@ -13,6 +13,7 @@ import type {
 	OrderCustomer,
 	OrderStatus,
 	PaymentStatus,
+	ProjectSection,
 	ShippingId,
 	ShopCategory,
 	ShopItem,
@@ -147,6 +148,19 @@ export interface NewsInput {
 	relatedDogSlugs?: string[];
 }
 
+/**
+ * Campos que acepta el panel al crear o editar una sección de `/project`.
+ *
+ * `position` en blanco = al final (crear) o sin mover (editar). Si la
+ * posición está ocupada, el backend recorre las demás.
+ */
+export interface ProjectSectionInput {
+	position?: number;
+	kind?: ProjectSection['kind'];
+	title?: string | null;
+	body?: string[];
+}
+
 export interface ContactChannelInput {
 	label?: string;
 	icon?: string;
@@ -199,6 +213,7 @@ export type {
 	OrderCustomer,
 	OrderStatus,
 	PaymentStatus,
+	ProjectSection,
 	ShippingId,
 	ShopCategory,
 	ShopItem,

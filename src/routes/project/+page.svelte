@@ -1,7 +1,15 @@
 <script lang="ts">
 	import { site, pageTitle } from '#lib/site';
+	import { renderRichText } from '#lib/data/rich-text';
 
 	const title = pageTitle('Soy Droopy Manuel');
+
+	let { data } = $props();
+
+	/** La API ya las trae ordenadas por `position`: aquí solo se agrupan por clase. */
+	let heroes = $derived(data.sections.filter((section) => section.kind === 'hero'));
+	let chapters = $derived(data.sections.filter((section) => section.kind === 'chapter'));
+	let closings = $derived(data.sections.filter((section) => section.kind === 'closing'));
 </script>
 
 <svelte:head>
@@ -17,79 +25,47 @@
 </svelte:head>
 
 <main class="container story">
-	<p class="tagline" aria-label="Soy Droopy Manuel">
-		<span aria-hidden="true">🌈</span>
-		<span>Soy Droopy Manuel</span>
-		<span aria-hidden="true">🌈</span>
-	</p>
-
-	<img
-		class="story-logo"
-		src="/logo.png"
-		alt="Droopy, el perrito que dio nombre a la fundación"
-		width="240"
-		height="150"
-		fetchpriority="high"
-		decoding="async"
-	/>
-
-	<section class="chapter glass" aria-label="El comienzo">
-		<p>Llegué a esta familia cuando tenía apenas 2 meses. Fui un regalo lleno de intención y amor.</p>
-		<p>
-			Viví mis primeros años rodeado de familia, risas y hogar. Pero desde el principio, una de
-			mis humanas y yo creamos un vínculo muy especial.
+	{#each heroes as hero (hero.id)}
+		<p class="tagline" aria-label={hero.title ?? `Sección ${hero.position}`}>
+			<span aria-hidden="true">🌈</span>
+			<span>{hero.title ?? ''}</span>
+			<span aria-hidden="true">🌈</span>
 		</p>
-	</section>
+	{/each}
 
-	<section class="chapter glass" aria-label="Nuestro camino juntos">
-		<h2>🐾 Nuestro camino juntos</h2>
-		<p>Cuando llegó el momento de que ella empezara una nueva etapa en su vida, me llevó con ella.</p>
-		<p>Y así comenzamos nuestro camino juntos.</p>
-	</section>
+	{#if heroes.length > 0}
+		<img
+			class="story-logo"
+			src="/logo.png"
+			alt="Droopy, el perrito que dio nombre a la fundación"
+			width="240"
+			height="150"
+			fetchpriority="high"
+			decoding="async"
+		/>
+	{/if}
 
-	<section class="chapter glass" aria-label="Crecimos juntos">
-		<h2>🌱 Crecimos juntos</h2>
-		<p>Mientras yo aprendía rutinas nuevas, ella aprendía a organizar su vida.</p>
-		<p>
-			En una etapa donde todo eran fiestas y llegar tarde, mi cuidado se convirtió en
-			responsabilidad. Mi bienestar se volvió motivo para trabajar, madurar y construir un futuro.
-		</p>
-		<p><strong>No fui solo su perro. Fui parte de su crecimiento.</strong></p>
-	</section>
+	{#each chapters as chapter (chapter.id)}
+		<section class="chapter glass" aria-label={chapter.title ?? `Sección ${chapter.position}`}>
+			{#if chapter.title}
+				<h2>{chapter.title}</h2>
+			{/if}
+			{#each chapter.body as paragraph}
+				<p>{@html renderRichText(paragraph)}</p>
+			{/each}
+		</section>
+	{/each}
 
-	<section class="chapter glass" aria-label="Trece años de amor">
-		<h2>💛 Trece años de amor</h2>
-		<p>Vivimos 13 años llenos de amor profundo. Y el 14 de febrero de 2025 crucé el arcoíris.</p>
-		<p>Mi partida fue rápida. Y el vacío… muy grande.</p>
-	</section>
-
-	<section class="chapter glass" aria-label="La historia se hizo propósito">
-		<h2>⭐ La historia se hizo propósito</h2>
-		<p>Pero mis humanas decidieron que mi historia no terminaría en tristeza.</p>
-		<p>
-			La transformaron en propósito. <strong>Así nació este proyecto.</strong> No desde la lástima,
-			sino desde el amor consciente y la responsabilidad: cada regalo que nace en mi nombre ayuda a
-			mejorar el bienestar de perritos comunitarios y callejeritos.
-		</p>
-		<p>Existe una tienda y cada compra apoya directamente a la manada comunitaria.</p>
-		<p>
-			El sistema de estrellas permite que la ayuda sea constante y sostenible, sin necesidad de
-			exponer el dolor, sino fortaleciendo a quienes ya cuidan y acompañan.
-		</p>
-		<p>
-			Quindi Estampados impulsa y financia este proyecto, porque también fue parte de mi historia
-			desde el principio.
-		</p>
-	</section>
-
-	<blockquote class="closing glass">
-		<p>Hoy sigo aquí. En cada estrella que se enciende, en cada gesto que mejora la vida de otro perrito, en cada decisión de amar con responsabilidad.</p>
-		<p><strong>Porque el amor verdadero no termina, se transforma en propósito.</strong></p>
-		<p>Y si estás leyendo esto… ya haces parte de mi manada 🐾✨</p>
-		<footer>
-			<a class="see-all" href="/manada">Conoce la manada →</a>
-		</footer>
-	</blockquote>
+	{#each closings as closing (closing.id)}
+		<blockquote class="closing glass">
+			{#each closing.body as paragraph}
+				<p>{@html renderRichText(paragraph)}</p>
+			{/each}
+			<footer>
+				<a class="see-all" href="/manada">Conoce la manada →</a>
+			</footer>
+		</blockquote>
+	{/each}
 </main>
 
 <style>

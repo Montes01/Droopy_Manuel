@@ -11,6 +11,7 @@
 		{ href: '/admin/manada', label: 'Manada' },
 		{ href: '/admin/tienda', label: 'Tienda' },
 		{ href: '/admin/noticias', label: 'Noticias' },
+		{ href: '/admin/proyecto', label: 'Proyecto' },
 		{ href: '/admin/sitio', label: 'Sitio' }
 	];
 

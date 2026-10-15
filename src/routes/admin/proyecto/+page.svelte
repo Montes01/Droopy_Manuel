@@ -39,6 +39,19 @@
 	 */
 	let selectedKind = $state('chapter');
 
+	/**
+	 * Solo puede haber una portada y un cierre: si ya existen, sus opciones se
+	 * deshabilitan (salvo al editar esa misma sección). A propósito solo en la
+	 * UI: en la base no hay restricción.
+	 */
+	let takenKinds = $derived(new Set(data.sections.map((section) => section.kind)));
+
+	function kindDisabled(kind: string): boolean {
+		if (kind !== 'hero' && kind !== 'closing') return false;
+		if (editing?.kind === kind) return false;
+		return takenKinds.has(kind);
+	}
+
 	/** Cuerpo en edición, un párrafo por línea. */
 	let bodyText = $derived(editing?.body.join('\n') ?? '');
 
@@ -94,7 +107,9 @@
 						onchange={(event) => (selectedKind = event.currentTarget.value)}
 					>
 						{#each data.kinds as option (option)}
-							<option value={option}>{kindLabels[option] ?? option}</option>
+							<option value={option} disabled={kindDisabled(option)}>
+								{kindLabels[option] ?? option}{kindDisabled(option) ? ' (ya existe)' : ''}
+							</option>
 						{/each}
 					</select>
 				</label>

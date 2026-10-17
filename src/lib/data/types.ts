@@ -48,7 +48,6 @@ export interface Dog {
 	size: DogSize;
 	energy: DogEnergy;
 	goodWith: DogGoodWith;
-	vaccinated: boolean;
 	sterilized: boolean;
 	status: DogStatus;
 	arrival: ISODate;
@@ -104,6 +103,57 @@ export interface DogNews {
 	photo: PhotoPath;
 	/** true = necesita ayuda urgente (se resalta en el perfil). */
 	urgent?: boolean;
+}
+
+// ------------------------------------------------------- Salud de la manada
+
+/**
+ * Salud de un perrito: baños y visita anual del veterinario. Copia de
+ * `Server/src/types.ts`: si cambia allí, cámbialo aquí.
+ *
+ * Vive en su propia tabla (1:1 con el perrito): si no hay fila o está vacía,
+ * el perfil no muestra la sección.
+ */
+export interface DogHealth {
+	dogSlug: Slug;
+	lastBath: ISODate | null;
+	nextBath: ISODate | null;
+	/** true = ya se hizo la visita anual. */
+	vetVisitDone: boolean;
+	/** Fecha de la visita anual (hecha o agendada). */
+	vetVisitDate: ISODate | null;
+}
+
+/**
+ * Una vacuna del perrito. `recommendation` es texto libre por perrito: la
+ * indicación que ve la comunidad.
+ */
+export interface DogVaccine {
+	id: number;
+	dogSlug: Slug;
+	name: string;
+	applied: boolean;
+	appliedDate: ISODate | null;
+	recommendation: string;
+}
+
+/** Un accesorio o elemento de seguridad del perrito. */
+export interface DogAccessory {
+	id: number;
+	dogSlug: Slug;
+	label: string;
+	/** Nota libre (talla, color, estado…). Null = sin nota. */
+	value: string | null;
+	/** true = lo tiene; false = le falta. */
+	provided: boolean;
+}
+
+/** Perfil de salud completo: lo que el modal pide de una sola vez. */
+export interface DogHealthProfile {
+	dogSlug: Slug;
+	health: DogHealth | null;
+	vaccines: DogVaccine[];
+	accessories: DogAccessory[];
 }
 
 /** Un perrito al que se puede dirigir una donación. */

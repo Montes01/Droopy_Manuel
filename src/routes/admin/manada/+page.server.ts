@@ -1,8 +1,14 @@
 import { fail } from '@sveltejs/kit';
 import { ApiRequestError } from '#lib/api/client';
 import { serverApi } from '#lib/api/server';
-import type { DogInput, DogNewsInput } from '#lib/data/admin-types';
-import type { Dog, DogNews } from '#lib/data/types';
+import type {
+	DogAccessoryInput,
+	DogHealthInput,
+	DogInput,
+	DogNewsInput,
+	DogVaccineInput
+} from '#lib/data/admin-types';
+import type { Dog, DogHealthProfile, DogNews } from '#lib/data/types';
 import { DOG_NEWS_KINDS, DOG_STATUSES } from '#lib/data/types';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -34,9 +40,23 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		(newsByDog[item.dogSlug] ??= []).push(item);
 	}
 
+	// Perfil de salud por perrito (solo los que tienen algún dato).
+	let profiles: DogHealthProfile[] = [];
+	try {
+		profiles = await serverApi.get<DogHealthProfile[]>('/api/dogs/health', cookies);
+	} catch {
+		profiles = [];
+	}
+
+	const healthByDog: Record<string, DogHealthProfile> = {};
+	for (const profile of profiles) {
+		healthByDog[profile.dogSlug] = profile;
+	}
+
 	return {
 		dogs,
 		newsByDog,
+		healthByDog,
 		options: {
 			statuses: [...DOG_STATUSES],
 			sizes: ['pequeño', 'mediano', 'grande'],
@@ -97,7 +117,6 @@ function readDogForm(form: FormData): DogInput {
 		};
 	}
 
-	if (form.has('vaccinated')) input.vaccinated = bool('vaccinated');
 	if (form.has('sterilized')) input.sterilized = bool('sterilized');
 	if (form.has('featured')) input.featured = bool('featured');
 
@@ -132,6 +151,73 @@ function readNewsForm(form: FormData): DogNewsInput {
 	// marcado, así desmarcar "urgente" también cuenta como cambio.
 	const urgent = form.getAll('urgent').map(String);
 	if (urgent.length > 0) input.urgent = urgent.includes('on');
+
+	return input;
+}
+
+/** Lee el bloque de salud (baños + veterinario) desde el formulario. */
+function readHealthForm(form: FormData): DogHealthInput {
+	const text = (name: string): string | null => {
+		const value = form.get(name);
+		if (value === null) return null;
+		const trimmed = String(value).trim();
+		return trimmed === '' ? null : trimmed;
+	};
+
+	return {
+		lastBath: text('lastBath'),
+		nextBath: text('nextBath'),
+		vetVisitDate: text('vetVisitDate'),
+		// Checkbox sin marcar no viene en FormData.
+		vetVisitDone: form.get('vetVisitDone') === 'on'
+	};
+}
+
+/** Hoy en ISO (`YYYY-MM-DD`), en hora local. */
+function todayISO(): string {
+	const now = new Date();
+	const month = String(now.getMonth() + 1).padStart(2, '0');
+	const day = String(now.getDate()).padStart(2, '0');
+	return `${now.getFullYear()}-${month}-${day}`;
+}
+
+/** Lee una vacuna desde el formulario. */
+function readVaccineForm(form: FormData): DogVaccineInput {
+	const text = (name: string): string | undefined => {
+		const value = form.get(name);
+		if (value === null) return undefined;
+		const trimmed = String(value).trim();
+		return trimmed === '' ? undefined : trimmed;
+	};
+
+	const applied = form.get('applied') === 'on';
+	const input: DogVaccineInput = { applied };
+	if (form.has('name')) input.name = text('name');
+	if (form.has('appliedDate')) {
+		let appliedDate = text('appliedDate') ?? null;
+		// Vacuna aplicada con fecha futura: se guarda con la de hoy.
+		if (applied && appliedDate && appliedDate > todayISO()) appliedDate = todayISO();
+		input.appliedDate = appliedDate;
+	}
+	if (form.has('recommendation')) input.recommendation = text('recommendation') ?? '';
+
+	return input;
+}
+
+/** Lee un accesorio desde el formulario. */
+function readAccessoryForm(form: FormData): DogAccessoryInput {
+	const text = (name: string): string | undefined => {
+		const value = form.get(name);
+		if (value === null) return undefined;
+		const trimmed = String(value).trim();
+		return trimmed === '' ? undefined : trimmed;
+	};
+
+	const input: DogAccessoryInput = {
+		provided: form.get('provided') === 'on'
+	};
+	if (form.has('label')) input.label = text('label');
+	if (form.has('value')) input.value = text('value') ?? null;
 
 	return input;
 }
@@ -278,6 +364,172 @@ export const actions: Actions = {
 			return { success: true, message: 'Comunicado eliminado.' };
 		} catch (error) {
 			return fail(400, { error: actionError(error, 'No se pudo borrar el comunicado.') });
+		}
+	},
+
+	/** Guarda el bloque de salud (baños + visita anual) de un perrito. */
+	saveHealth: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		if (!slug) return fail(400, { error: 'Falta el perrito de la salud.' });
+
+		try {
+			await serverApi.put(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/health`,
+				cookies,
+				readHealthForm(form)
+			);
+			return { success: true, message: 'Salud actualizada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo guardar la salud.') });
+		}
+	},
+
+	/** Agrega una vacuna al perfil de un perrito. */
+	addVaccine: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		if (!slug) return fail(400, { error: 'Falta el perrito de la vacuna.' });
+
+		try {
+			await serverApi.post(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/vaccines`,
+				cookies,
+				readVaccineForm(form)
+			);
+			return { success: true, message: 'Vacuna agregada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo crear la vacuna.') });
+		}
+	},
+
+	/** Edita una vacuna existente. */
+	updateVaccine: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		const id = String(form.get('id') ?? '').trim();
+		if (!slug || !id) return fail(400, { error: 'Falta la vacuna a editar.' });
+
+		try {
+			await serverApi.patch(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/vaccines/${encodeURIComponent(id)}`,
+				cookies,
+				readVaccineForm(form)
+			);
+			return { success: true, message: 'Vacuna actualizada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo actualizar la vacuna.') });
+		}
+	},
+
+	/** Alterna «aplicada» desde la lista, sin abrir el formulario. */
+	toggleVaccine: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		const id = String(form.get('id') ?? '').trim();
+		if (!slug || !id) return fail(400, { error: 'Falta la vacuna a cambiar.' });
+
+		try {
+			await serverApi.patch(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/vaccines/${encodeURIComponent(id)}`,
+				cookies,
+				readVaccineForm(form)
+			);
+			return { success: true, message: 'Vacuna actualizada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo actualizar la vacuna.') });
+		}
+	},
+
+	/** Borra una vacuna. La API exige rol admin. */
+	deleteVaccine: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		const id = String(form.get('id') ?? '').trim();
+		if (!slug || !id) return fail(400, { error: 'Falta la vacuna a borrar.' });
+
+		try {
+			await serverApi.delete(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/vaccines/${encodeURIComponent(id)}`,
+				cookies
+			);
+			return { success: true, message: 'Vacuna eliminada.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo borrar la vacuna.') });
+		}
+	},
+
+	/** Agrega un accesorio al perfil de un perrito. */
+	addAccessory: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		if (!slug) return fail(400, { error: 'Falta el perrito del accesorio.' });
+
+		try {
+			await serverApi.post(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/accessories`,
+				cookies,
+				readAccessoryForm(form)
+			);
+			return { success: true, message: 'Accesorio agregado.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo crear el accesorio.') });
+		}
+	},
+
+	/** Edita un accesorio existente. */
+	updateAccessory: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		const id = String(form.get('id') ?? '').trim();
+		if (!slug || !id) return fail(400, { error: 'Falta el accesorio a editar.' });
+
+		try {
+			await serverApi.patch(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/accessories/${encodeURIComponent(id)}`,
+				cookies,
+				readAccessoryForm(form)
+			);
+			return { success: true, message: 'Accesorio actualizado.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo actualizar el accesorio.') });
+		}
+	},
+
+	/** Alterna «lo tiene» desde la lista, sin abrir el formulario. */
+	toggleAccessory: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		const id = String(form.get('id') ?? '').trim();
+		if (!slug || !id) return fail(400, { error: 'Falta el accesorio a cambiar.' });
+
+		try {
+			await serverApi.patch(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/accessories/${encodeURIComponent(id)}`,
+				cookies,
+				readAccessoryForm(form)
+			);
+			return { success: true, message: 'Accesorio actualizado.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo actualizar el accesorio.') });
+		}
+	},
+
+	/** Borra un accesorio. La API exige rol admin. */
+	deleteAccessory: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		const id = String(form.get('id') ?? '').trim();
+		if (!slug || !id) return fail(400, { error: 'Falta el accesorio a borrar.' });
+
+		try {
+			await serverApi.delete(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/accessories/${encodeURIComponent(id)}`,
+				cookies
+			);
+			return { success: true, message: 'Accesorio eliminado.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo borrar el accesorio.') });
 		}
 	}
 };

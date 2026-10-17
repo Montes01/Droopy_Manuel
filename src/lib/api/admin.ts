@@ -6,9 +6,15 @@ import type {
 	BankAccountInput,
 	ContactChannelInput,
 	Dog,
+	DogAccessory,
+	DogAccessoryInput,
+	DogHealth,
+	DogHealthInput,
 	DogInput,
 	DogNews,
 	DogNewsInput,
+	DogVaccine,
+	DogVaccineInput,
 	DonationTier,
 	DonationTierInput,
 	NewsInput,
@@ -146,6 +152,52 @@ export async function updateDogNews(
 
 export async function deleteDogNews(slug: string, id: number): Promise<void> {
 	await api.delete(`/api/admin/dogs/${encodeURIComponent(slug)}/news/${id}`);
+}
+
+/** Guarda (crea o actualiza) el bloque de salud del perrito. */
+export async function saveDogHealth(slug: string, input: DogHealthInput): Promise<DogHealth> {
+	return api.put<DogHealth>(`/api/admin/dogs/${encodeURIComponent(slug)}/health`, input);
+}
+
+export async function createDogVaccine(slug: string, input: DogVaccineInput): Promise<DogVaccine> {
+	return api.post<DogVaccine>(`/api/admin/dogs/${encodeURIComponent(slug)}/vaccines`, input);
+}
+
+export async function updateDogVaccine(
+	slug: string,
+	id: number,
+	input: DogVaccineInput
+): Promise<DogVaccine> {
+	return api.patch<DogVaccine>(
+		`/api/admin/dogs/${encodeURIComponent(slug)}/vaccines/${id}`,
+		input
+	);
+}
+
+export async function deleteDogVaccine(slug: string, id: number): Promise<void> {
+	await api.delete(`/api/admin/dogs/${encodeURIComponent(slug)}/vaccines/${id}`);
+}
+
+export async function createDogAccessory(
+	slug: string,
+	input: DogAccessoryInput
+): Promise<DogAccessory> {
+	return api.post<DogAccessory>(`/api/admin/dogs/${encodeURIComponent(slug)}/accessories`, input);
+}
+
+export async function updateDogAccessory(
+	slug: string,
+	id: number,
+	input: DogAccessoryInput
+): Promise<DogAccessory> {
+	return api.patch<DogAccessory>(
+		`/api/admin/dogs/${encodeURIComponent(slug)}/accessories/${id}`,
+		input
+	);
+}
+
+export async function deleteDogAccessory(slug: string, id: number): Promise<void> {
+	await api.delete(`/api/admin/dogs/${encodeURIComponent(slug)}/accessories/${id}`);
 }
 
 // ------------------------------------------------------------------ Tienda

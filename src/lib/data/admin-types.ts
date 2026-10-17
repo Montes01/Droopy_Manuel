@@ -7,7 +7,11 @@
 import type {
 	BankAccount,
 	Dog,
+	DogAccessory,
+	DogHealth,
+	DogHealthProfile,
 	DogNews,
+	DogVaccine,
 	DonationTier,
 	NewsItem,
 	Order,
@@ -90,7 +94,6 @@ export interface DogInput {
 	size?: Dog['size'];
 	energy?: Dog['energy'];
 	goodWith?: Partial<Dog['goodWith']>;
-	vaccinated?: boolean;
 	sterilized?: boolean;
 	status?: Dog['status'];
 	arrival?: string;
@@ -114,6 +117,34 @@ export interface DogNewsInput {
 	date?: string;
 	photo?: string | null;
 	urgent?: boolean;
+}
+
+/**
+ * Campos del bloque de salud (baños + veterinario). Todos opcionales: al
+ * guardar se envía solo lo que cambió.
+ */
+export interface DogHealthInput {
+	lastBath?: string | null;
+	nextBath?: string | null;
+	vetVisitDone?: boolean;
+	vetVisitDate?: string | null;
+}
+
+/** Campos de una vacuna del perrito. */
+export interface DogVaccineInput {
+	name?: string;
+	applied?: boolean;
+	appliedDate?: string | null;
+	recommendation?: string;
+	sortOrder?: number;
+}
+
+/** Campos de un accesorio del perrito. */
+export interface DogAccessoryInput {
+	label?: string;
+	value?: string | null;
+	provided?: boolean;
+	sortOrder?: number;
 }
 
 export interface ShopCategoryInput {
@@ -221,7 +252,11 @@ export interface SiteStatsInput {
 export type {
 	BankAccount,
 	Dog,
+	DogAccessory,
+	DogHealth,
+	DogHealthProfile,
 	DogNews,
+	DogVaccine,
 	DonationTier,
 	NewsItem,
 	Order,

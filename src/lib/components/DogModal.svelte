@@ -1,8 +1,10 @@
 <script lang="ts">
-	import type { Dog, DogNews } from '#lib/data/types';
+	import type { Dog, DogAccessory, DogHealth, DogNews, DogVaccine } from '#lib/data/types';
 	import { formatDogAge } from '#lib/data/format';
-	import { getDogNews } from '#lib/api/dogs';
+	import { getDogHealth, getDogNews } from '#lib/api/dogs';
 	import DogNewsFeed from '#lib/components/DogNewsFeed.svelte';
+	import DogHealthSection from '#lib/components/DogHealthSection.svelte';
+	import DogAccessoriesSection from '#lib/components/DogAccessoriesSection.svelte';
 
 	interface Props {
 		dog: Dog | null;
@@ -18,6 +20,11 @@
 
 	/** Comunicados del perrito abierto (vacío = perfil sin novedades). */
 	let news = $state<DogNews[]>([]);
+
+	/** Salud del perrito abierto: baños, vacunas y accesorios. */
+	let health = $state<DogHealth | null>(null);
+	let vaccines = $state<DogVaccine[]>([]);
+	let accessories = $state<DogAccessory[]>([]);
 
 	$effect(() => {
 		if (dog) closing = false;
@@ -39,6 +46,31 @@
 			})
 			.catch(() => {
 				// Sin API, el perfil se muestra igual, solo sin comunicados.
+			});
+
+		return () => {
+			cancelled = true;
+		};
+	});
+
+	/** Carga la salud al abrir, con el mismo patrón que los comunicados. */
+	$effect(() => {
+		const slug = dog?.slug;
+		health = null;
+		vaccines = [];
+		accessories = [];
+		if (!slug) return;
+
+		let cancelled = false;
+		getDogHealth(slug)
+			.then((profile) => {
+				if (cancelled) return;
+				health = profile.health;
+				vaccines = profile.vaccines;
+				accessories = profile.accessories;
+			})
+			.catch(() => {
+				// Sin API, el perfil se muestra igual, solo sin sección de salud.
 			});
 
 		return () => {
@@ -88,13 +120,6 @@
 						<dd>{dog.energy}</dd>
 					</div>
 					<div>
-						<dt>Salud</dt>
-						<dd>
-							{dog.vaccinated ? 'Vacunado' : 'Sin vacunar'} ·
-							{dog.sterilized ? 'Esterilizado' : 'Pendiente'}
-						</dd>
-					</div>
-					<div>
 						<dt>Convive con</dt>
 						<dd>
 							{[
@@ -115,6 +140,10 @@
 				</ul>
 
 				<p class="story">{dog.story}</p>
+
+				<DogHealthSection {health} {vaccines} sterilized={dog.sterilized} {accent} />
+
+				<DogAccessoriesSection {accessories} {accent} />
 
 				<DogNewsFeed {news} accent={accent} />
 			</div>
@@ -140,7 +169,7 @@
 		--dog: #7a3f16;
 		width: 100%;
 		max-width: 34rem;
-		max-height: 88dvh;
+		max-height: 1000px;
 		overflow-y: auto;
 		border-radius: 1.5rem;
 		background: #ffffff;

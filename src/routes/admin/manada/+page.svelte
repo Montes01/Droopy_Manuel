@@ -2,9 +2,10 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 	import ImageUpload from '#lib/components/ImageUpload.svelte';
-	import type { Dog } from '#lib/data/admin-types';
+	import type { Dog, DogVaccine } from '#lib/data/admin-types';
 	import { DOG_STATUSES, dogStatusLabels } from '#lib/data/dog-status';
 	import { dogNewsKindEmoji, dogNewsKindLabels } from '#lib/data/dog-news-labels';
+	import { accessorySuggestions, vaccineSuggestions } from '#lib/data/dog-health-labels';
 	import { formatDogAge } from '#lib/data/format';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -18,6 +19,66 @@
 	let showNewsForm = $state(false);
 	let currentNews = $derived(editing ? (data.newsByDog[editing.slug] ?? []) : []);
 
+	/** Salud del perrito en edición (solo para uno ya creado). */
+	let vaccineEditingId = $state<number | null>(null);
+	let showVaccineForm = $state(false);
+	let accessoryEditingId = $state<number | null>(null);
+	let showAccessoryForm = $state(false);
+
+	let currentProfile = $derived(editing ? (data.healthByDog[editing.slug] ?? null) : null);
+	let currentHealth = $derived(currentProfile?.health ?? null);
+	let currentVaccines = $derived(currentProfile?.vaccines ?? []);
+	let currentAccessories = $derived(currentProfile?.accessories ?? []);
+
+	/** Fecha y estado del formulario de vacuna nueva. */
+	let newVaccineDate = $state('');
+	let newVaccineApplied = $state(false);
+
+	/** Fecha y estado del formulario de vacuna en edición. */
+	let editVaccineDate = $state('');
+	let editVaccineApplied = $state(false);
+
+	// Al abrir el formulario de vacuna nueva, parte vacío.
+	$effect(() => {
+		if (showVaccineForm) {
+			newVaccineDate = '';
+			newVaccineApplied = false;
+		}
+	});
+
+	// Al editar una vacuna, carga su fecha y estado.
+	$effect(() => {
+		const id = vaccineEditingId;
+		if (id === null) return;
+		const vaccine = currentVaccines.find((item) => item.id === id);
+		if (vaccine) {
+			editVaccineDate = vaccine.appliedDate ?? '';
+			editVaccineApplied = vaccine.applied;
+		}
+	});
+
+	// Si se marca como aplicada con fecha futura, la fecha pasa a hoy.
+	$effect(() => {
+		if (newVaccineApplied && isFutureDate(newVaccineDate)) newVaccineDate = todayISO();
+	});
+	$effect(() => {
+		if (editVaccineApplied && isFutureDate(editVaccineDate)) editVaccineDate = todayISO();
+	});
+
+	/** Hoy en ISO (`YYYY-MM-DD`), en hora local. */
+	function todayISO(): string {
+		const now = new Date();
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const day = String(now.getDate()).padStart(2, '0');
+		return `${now.getFullYear()}-${month}-${day}`;
+	}
+
+	/** ¿La fecha es posterior a hoy? Se comparan como texto (`YYYY-MM-DD`). */
+	function isFutureDate(value: string): boolean {
+		if (!value) return false;
+		return value > todayISO();
+	}
+
 	/** Orden actual, para mover arriba/abajo. */
 	let orderedSlugs = $derived(data.dogs.map((dog) => dog.slug).join(','));
 
@@ -26,22 +87,32 @@
 		showNewsForm = false;
 	}
 
+	function resetCare() {
+		vaccineEditingId = null;
+		showVaccineForm = false;
+		accessoryEditingId = null;
+		showAccessoryForm = false;
+	}
+
 	function startCreate() {
 		editing = null;
 		showForm = true;
 		resetNews();
+		resetCare();
 	}
 
 	function startEdit(dog: Dog) {
 		editing = dog;
 		showForm = true;
 		resetNews();
+		resetCare();
 	}
 
 	function closeForm() {
 		showForm = false;
 		editing = null;
 		resetNews();
+		resetCare();
 	}
 </script>
 
@@ -202,11 +273,7 @@
 			</fieldset>
 
 			<fieldset>
-				<legend>Salud y visibilidad</legend>
-				<label class="inline">
-					<input type="checkbox" name="vaccinated" checked={editing?.vaccinated ?? false} />
-					Vacunado
-				</label>
+				<legend>Esterilizado y visibilidad</legend>
 				<label class="inline">
 					<input type="checkbox" name="sterilized" checked={editing?.sterilized ?? false} />
 					Esterilizado
@@ -386,7 +453,7 @@
 												title="Editar"
 												onclick={() => (newsEditingId = item.id)}
 											>
-												✎
+												✏️
 											</button>
 											<form method="POST" action="?/deleteNews" use:enhance>
 												<input type="hidden" name="slug" value={editing.slug} />
@@ -411,6 +478,388 @@
 						{/each}
 					</ul>
 				{/if}
+			</section>
+
+			<section class="care-block">
+				<header class="care-head">
+					<h3>Salud</h3>
+				</header>
+
+				<form
+					method="POST"
+					action="?/saveHealth"
+					use:enhance={() => {
+						return async ({ update }) => {
+							await update();
+						};
+					}}
+				>
+					<input type="hidden" name="slug" value={editing.slug} />
+					<div class="grid">
+						<label>
+							Último baño integral
+							<input name="lastBath" type="date" value={currentHealth?.lastBath ?? ''} />
+						</label>
+						<label>
+							Próximo baño integral
+							<input name="nextBath" type="date" value={currentHealth?.nextBath ?? ''} />
+						</label>
+						<label>
+							Fecha visita anual
+							<input name="vetVisitDate" type="date" value={currentHealth?.vetVisitDate ?? ''} />
+						</label>
+						<label class="inline end">
+							<input type="checkbox" name="vetVisitDone" checked={currentHealth?.vetVisitDone ?? false} />
+							Visita anual hecha
+						</label>
+					</div>
+					<div class="actions">
+						<button class="primary" type="submit">Guardar salud</button>
+					</div>
+				</form>
+
+				<div class="care-sub">
+					<header class="care-head">
+						<h4>Vacunas</h4>
+						<button
+							class="ghost"
+							type="button"
+							onclick={() => {
+								vaccineEditingId = null;
+								showVaccineForm = !showVaccineForm;
+							}}
+						>
+							{showVaccineForm ? 'Cancelar' : 'Agregar vacuna'}
+						</button>
+					</header>
+
+					{#if showVaccineForm}
+						<div class="suggest">
+							<span class="hint">Sugerencias:</span>
+							{#each vaccineSuggestions as suggestion (suggestion.name)}
+								<form method="POST" action="?/addVaccine" use:enhance>
+									<input type="hidden" name="slug" value={editing.slug} />
+									<input type="hidden" name="name" value={suggestion.name} />
+									<input type="hidden" name="recommendation" value={suggestion.recommendation} />
+									<button class="chip" type="submit" title={suggestion.recommendation}>
+										{suggestion.name}
+									</button>
+								</form>
+							{/each}
+						</div>
+
+						<form
+							method="POST"
+							action="?/addVaccine"
+							use:enhance={() => {
+								return async ({ result, update }) => {
+									await update();
+									if (result.type === 'success') showVaccineForm = false;
+								};
+							}}
+						>
+							<input type="hidden" name="slug" value={editing.slug} />
+							<div class="grid">
+								<label>
+									Nombre *
+									<input name="name" maxlength="120" required placeholder="Rabia" />
+								</label>
+								<label>
+									Fecha de aplicación
+									<input name="appliedDate" type="date" bind:value={newVaccineDate} />
+								</label>
+							</div>
+							<label class="wide">
+								Recomendación
+								<textarea name="recommendation" rows="2" placeholder="Refuerzo anual…"></textarea>
+							</label>
+							<label class="inline">
+								<input type="checkbox" name="applied" bind:checked={newVaccineApplied} />
+								Ya está aplicada
+							</label>
+							<div class="actions">
+								<button class="primary" type="submit">Agregar</button>
+							</div>
+						</form>
+					{/if}
+
+					{#if currentVaccines.length === 0}
+						<p class="empty">Sin vacunas registradas.</p>
+					{:else}
+						<ul class="care-list">
+							{#each currentVaccines as vaccine (vaccine.id)}
+								<li>
+									{#if vaccineEditingId === vaccine.id}
+										<form
+											method="POST"
+											action="?/updateVaccine"
+											use:enhance={() => {
+												return async ({ result, update }) => {
+													await update();
+													if (result.type === 'success') vaccineEditingId = null;
+												};
+											}}
+										>
+											<input type="hidden" name="slug" value={editing.slug} />
+											<input type="hidden" name="id" value={vaccine.id} />
+											<div class="grid">
+												<label>
+													Nombre *
+													<input name="name" maxlength="120" value={vaccine.name} required />
+												</label>
+												<label>
+													Fecha de aplicación
+													<input name="appliedDate" type="date" bind:value={editVaccineDate} />
+												</label>
+											</div>
+											<label class="wide">
+												Recomendación
+												<textarea name="recommendation" rows="2">{vaccine.recommendation}</textarea>
+											</label>
+											<label class="inline">
+												<input type="checkbox" name="applied" bind:checked={editVaccineApplied} />
+												Ya está aplicada
+											</label>
+											<div class="actions">
+												<button class="primary" type="submit">Guardar</button>
+												<button class="ghost" type="button" onclick={() => (vaccineEditingId = null)}>
+													Cancelar
+												</button>
+											</div>
+										</form>
+									{:else}
+										<div class="care-row">
+											<div class="care-info">
+												<span class="care-meta">
+													<span class="tag {vaccine.applied ? 'ok' : 'warn'}">
+														{vaccine.applied ? 'Aplicada' : 'Pendiente'}
+													</span>
+													{#if vaccine.appliedDate}· {vaccine.appliedDate}{/if}
+												</span>
+												<strong>{vaccine.name}</strong>
+												{#if vaccine.recommendation}
+													<span class="rec">{vaccine.recommendation}</span>
+												{/if}
+											</div>
+											<div class="row-actions">
+												<form
+													method="POST"
+													action="?/toggleVaccine"
+													use:enhance
+												>
+													<input type="hidden" name="slug" value={editing.slug} />
+													<input type="hidden" name="id" value={vaccine.id} />
+													<input type="hidden" name="appliedDate" value={vaccine.appliedDate ?? ''} />
+													<label
+														class="switch"
+														title={vaccine.applied ? 'Marcar como pendiente' : 'Marcar como aplicada'}
+													>
+														<input
+															class="switch-input"
+															type="checkbox"
+															name="applied"
+															checked={vaccine.applied}
+															aria-label="Aplicada"
+															onchange={(event) => event.currentTarget.form?.requestSubmit()}
+														/>
+														<span class="switch-slider"></span>
+													</label>
+												</form>
+												<button
+													class="icon"
+													type="button"
+													title="Editar"
+													onclick={() => (vaccineEditingId = vaccine.id)}
+												>
+													✏️
+												</button>
+												<form method="POST" action="?/deleteVaccine" use:enhance>
+													<input type="hidden" name="slug" value={editing.slug} />
+													<input type="hidden" name="id" value={vaccine.id} />
+													<button
+														class="icon danger"
+														type="submit"
+														title="Borrar"
+														onclick={(event) => {
+															if (!confirm('¿Borrar esta vacuna? No se puede deshacer.')) {
+																event.preventDefault();
+															}
+														}}
+													>
+														🗑
+													</button>
+												</form>
+											</div>
+										</div>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
+
+				<div class="care-sub">
+					<header class="care-head">
+						<h4>Accesorios y seguridad</h4>
+						<button
+							class="ghost"
+							type="button"
+							onclick={() => {
+								accessoryEditingId = null;
+								showAccessoryForm = !showAccessoryForm;
+							}}
+						>
+							{showAccessoryForm ? 'Cancelar' : 'Agregar accesorio'}
+						</button>
+					</header>
+
+					{#if showAccessoryForm}
+						<div class="suggest">
+							<span class="hint">Sugerencias:</span>
+							{#each accessorySuggestions as label (label)}
+								<form method="POST" action="?/addAccessory" use:enhance>
+									<input type="hidden" name="slug" value={editing.slug} />
+									<input type="hidden" name="label" value={label} />
+									<button class="chip" type="submit">{label}</button>
+								</form>
+							{/each}
+						</div>
+
+						<form
+							method="POST"
+							action="?/addAccessory"
+							use:enhance={() => {
+								return async ({ result, update }) => {
+									await update();
+									if (result.type === 'success') showAccessoryForm = false;
+								};
+							}}
+						>
+							<input type="hidden" name="slug" value={editing.slug} />
+							<div class="grid">
+								<label>
+									Nombre *
+									<input name="label" maxlength="120" required placeholder="Collar" />
+								</label>
+								<label>
+									Nota (talla, color…)
+									<input name="value" maxlength="160" />
+								</label>
+							</div>
+							<label class="inline">
+								<input type="checkbox" name="provided" />
+								Lo tiene (si no, se marca como «falta»)
+							</label>
+							<div class="actions">
+								<button class="primary" type="submit">Agregar</button>
+							</div>
+						</form>
+					{/if}
+
+					{#if currentAccessories.length === 0}
+						<p class="empty">Sin accesorios registrados.</p>
+					{:else}
+						<ul class="care-list">
+							{#each currentAccessories as accessory (accessory.id)}
+								<li>
+									{#if accessoryEditingId === accessory.id}
+										<form
+											method="POST"
+											action="?/updateAccessory"
+											use:enhance={() => {
+												return async ({ result, update }) => {
+													await update();
+													if (result.type === 'success') accessoryEditingId = null;
+												};
+											}}
+										>
+											<input type="hidden" name="slug" value={editing.slug} />
+											<input type="hidden" name="id" value={accessory.id} />
+											<div class="grid">
+												<label>
+													Nombre *
+													<input name="label" maxlength="120" value={accessory.label} required />
+												</label>
+												<label>
+													Nota
+													<input name="value" maxlength="160" value={accessory.value ?? ''} />
+												</label>
+											</div>
+											<label class="inline">
+												<input type="checkbox" name="provided" checked={accessory.provided} />
+												Lo tiene
+											</label>
+											<div class="actions">
+												<button class="primary" type="submit">Guardar</button>
+												<button class="ghost" type="button" onclick={() => (accessoryEditingId = null)}>
+													Cancelar
+												</button>
+											</div>
+										</form>
+									{:else}
+										<div class="care-row">
+											<div class="care-info">
+												<span class="care-meta">
+													<span class="tag {accessory.provided ? 'ok' : 'warn'}">
+														{accessory.provided ? 'Tiene' : 'Falta'}
+													</span>
+												</span>
+												<strong>{accessory.label}</strong>
+												{#if accessory.value}
+													<span class="rec">{accessory.value}</span>
+												{/if}
+											</div>
+											<div class="row-actions">
+												<form method="POST" action="?/toggleAccessory" use:enhance>
+													<input type="hidden" name="slug" value={editing.slug} />
+													<input type="hidden" name="id" value={accessory.id} />
+													<label
+														class="switch"
+														title={accessory.provided ? 'Marcar como que falta' : 'Marcar como que lo tiene'}
+													>
+														<input
+															class="switch-input"
+															type="checkbox"
+															name="provided"
+															checked={accessory.provided}
+															aria-label="Lo tiene"
+															onchange={(event) => event.currentTarget.form?.requestSubmit()}
+														/>
+														<span class="switch-slider"></span>
+													</label>
+												</form>
+												<button
+													class="icon"
+													type="button"
+													title="Editar"
+													onclick={() => (accessoryEditingId = accessory.id)}
+												>
+													✏️
+												</button>
+												<form method="POST" action="?/deleteAccessory" use:enhance>
+													<input type="hidden" name="slug" value={editing.slug} />
+													<input type="hidden" name="id" value={accessory.id} />
+													<button
+														class="icon danger"
+														type="submit"
+														title="Borrar"
+														onclick={(event) => {
+															if (!confirm('¿Borrar este accesorio? No se puede deshacer.')) {
+																event.preventDefault();
+															}
+														}}
+													>
+														🗑
+													</button>
+												</form>
+											</div>
+										</div>
+									{/if}
+								</li>
+							{/each}
+						</ul>
+					{/if}
+				</div>
 			</section>
 		{/if}
 	</section>
@@ -472,7 +921,7 @@
 									↓
 								</button>
 							</form>
-							<button class="icon" onclick={() => startEdit(dog)} title="Editar">✎</button>
+							<button class="icon" onclick={() => startEdit(dog)} title="Editar">✏️</button>
 							<form method="POST" action="?/delete" use:enhance>
 								<input type="hidden" name="slug" value={dog.slug} />
 								<button
@@ -802,10 +1251,18 @@
 	}
 
 	.row-actions form {
-		display: inline;
+		display: contents;
+	}
+
+	.row-actions .switch {
+		display: block;
+		margin: 0;
 	}
 
 	.icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
 		width: 1.875rem;
 		height: 1.875rem;
 		border: 1px solid #ccd2d9;
@@ -898,6 +1355,132 @@
 	.tag.urgent {
 		background: #fdecec;
 		color: #b91c1c;
+	}
+
+	/* ---------- Salud, vacunas y accesorios (dentro del editor) ---------- */
+
+	.care-block {
+		margin-top: 1.5rem;
+		padding-top: 1.25rem;
+		border-top: 2px dashed #e2e5e9;
+	}
+
+	.care-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.care-head h3 {
+		margin: 0;
+		font-size: 1rem;
+	}
+
+	.care-head h4 {
+		margin: 0;
+		font-size: 0.9375rem;
+	}
+
+	.care-sub {
+		margin-top: 1.25rem;
+	}
+
+	.care-block form {
+		margin-bottom: 0.75rem;
+	}
+
+	.care-block .empty {
+		padding: 1rem;
+	}
+
+	label.end {
+		align-self: end;
+	}
+
+	.suggest {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.375rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.hint {
+		font-size: 0.8125rem;
+		color: #5b6470;
+	}
+
+	.suggest form {
+		margin: 0;
+		display: inline;
+	}
+
+	.chip {
+		padding: 0.1875rem 0.625rem;
+		border: 1px solid #ccd2d9;
+		border-radius: 999px;
+		background: #fff;
+		font: inherit;
+		font-size: 0.8125rem;
+		cursor: pointer;
+	}
+
+	.chip:hover {
+		border-color: #7a3f16;
+		color: #7a3f16;
+	}
+
+	.care-list {
+		list-style: none;
+		display: grid;
+		gap: 0.5rem;
+		margin: 0;
+		padding: 0;
+	}
+
+	.care-list > li {
+		padding: 0.75rem;
+		border: 1px solid #e2e5e9;
+		border-radius: 0.5rem;
+		background: #fbfcfd;
+	}
+
+	.care-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.care-info {
+		display: grid;
+		gap: 0.125rem;
+		min-width: 0;
+	}
+
+	.care-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.8125rem;
+		color: #5b6470;
+	}
+
+	.rec {
+		font-size: 0.8125rem;
+		color: #5b6470;
+	}
+
+	.tag.ok {
+		background: #e7f6ec;
+		color: #15803d;
+	}
+
+	.tag.warn {
+		background: #fdf3e0;
+		color: #b45309;
 	}
 
 	@media (max-width: 40rem) {

@@ -1,6 +1,8 @@
 <script lang="ts">
-	import type { Dog } from '#lib/data/types';
+	import type { Dog, DogNews } from '#lib/data/types';
 	import { formatDogAge } from '#lib/data/format';
+	import { getDogNews } from '#lib/api/dogs';
+	import DogNewsFeed from '#lib/components/DogNewsFeed.svelte';
 
 	interface Props {
 		dog: Dog | null;
@@ -14,8 +16,34 @@
 	/** Color principal del perrito; ausente = marrón de la marca. */
 	let accent = $derived(dog?.color ?? '#7a3f16');
 
+	/** Comunicados del perrito abierto (vacío = perfil sin novedades). */
+	let news = $state<DogNews[]>([]);
+
 	$effect(() => {
 		if (dog) closing = false;
+	});
+
+	/**
+	 * Carga los comunicados al abrir. El modal no es una página, así que los
+	 * pide a la capa API; una carga vieja se descarta si cambia el perrito.
+	 */
+	$effect(() => {
+		const slug = dog?.slug;
+		news = [];
+		if (!slug) return;
+
+		let cancelled = false;
+		getDogNews(slug)
+			.then((rows) => {
+				if (!cancelled) news = rows;
+			})
+			.catch(() => {
+				// Sin API, el perfil se muestra igual, solo sin comunicados.
+			});
+
+		return () => {
+			cancelled = true;
+		};
 	});
 
 	function requestClose() {
@@ -87,6 +115,8 @@
 				</ul>
 
 				<p class="story">{dog.story}</p>
+
+				<DogNewsFeed {news} accent={accent} />
 			</div>
 		</div>
 	</div>

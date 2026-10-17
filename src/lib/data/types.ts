@@ -67,6 +67,45 @@ export interface Dog {
 /** Vista de la manada: vivos o en el cielo. */
 export type PackView = 'alive' | 'heaven';
 
+// ------------------------------------------------ Comunicados de la manada
+
+/**
+ * Tipos de comunicado que la fundación publica en el perfil de un perrito.
+ *
+ * Copia de `Server/src/types.ts` (DOG_NEWS_KINDS): si cambia allí, cámbialo
+ * aquí. Las etiquetas y emojis viven en `./dog-news-labels`; no los dupliques
+ * en componentes o páginas.
+ */
+export const DOG_NEWS_KINDS = [
+	'general',
+	'examen',
+	'tratamiento',
+	'cirugia',
+	'recuperacion'
+] as const;
+
+export type DogNewsKind = (typeof DOG_NEWS_KINDS)[number];
+
+/**
+ * Un comunicado de un perrito: la novedad que ve la comunidad en su perfil.
+ *
+ * `id` es interno: la web pública lo ignora, pero el panel lo necesita para
+ * editar y borrar un comunicado concreto.
+ */
+export interface DogNews {
+	id: number;
+	dogSlug: Slug;
+	kind: DogNewsKind;
+	title: string;
+	body: string;
+	/** Fecha ISO (YYYY-MM-DD). Ordena el feed: más reciente primero. */
+	date: ISODate;
+	/** Ruta en /static cuando haya foto real. Null = sin imagen. */
+	photo: PhotoPath;
+	/** true = necesita ayuda urgente (se resalta en el perfil). */
+	urgent?: boolean;
+}
+
 /** Un perrito al que se puede dirigir una donación. */
 export interface DonationTarget {
 	dog: Dog;

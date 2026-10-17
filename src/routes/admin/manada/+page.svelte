@@ -4,6 +4,7 @@
 	import ImageUpload from '#lib/components/ImageUpload.svelte';
 	import type { Dog } from '#lib/data/admin-types';
 	import { DOG_STATUSES, dogStatusLabels } from '#lib/data/dog-status';
+	import { dogNewsKindEmoji, dogNewsKindLabels } from '#lib/data/dog-news-labels';
 	import { formatDogAge } from '#lib/data/format';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -12,22 +13,35 @@
 	let editing = $state<Dog | null>(null);
 	let showForm = $state(false);
 
+	/** Comunicados del perrito en edición (solo para uno ya creado). */
+	let newsEditingId = $state<number | null>(null);
+	let showNewsForm = $state(false);
+	let currentNews = $derived(editing ? (data.newsByDog[editing.slug] ?? []) : []);
+
 	/** Orden actual, para mover arriba/abajo. */
 	let orderedSlugs = $derived(data.dogs.map((dog) => dog.slug).join(','));
+
+	function resetNews() {
+		newsEditingId = null;
+		showNewsForm = false;
+	}
 
 	function startCreate() {
 		editing = null;
 		showForm = true;
+		resetNews();
 	}
 
 	function startEdit(dog: Dog) {
 		editing = dog;
 		showForm = true;
+		resetNews();
 	}
 
 	function closeForm() {
 		showForm = false;
 		editing = null;
+		resetNews();
 	}
 </script>
 
@@ -208,6 +222,197 @@
 				<button class="ghost" type="button" onclick={closeForm}>Cancelar</button>
 			</div>
 		</form>
+
+		{#if editing}
+			<section class="news-block">
+				<header class="news-head">
+					<h3>Comunicados</h3>
+					<button
+						class="ghost"
+						type="button"
+						onclick={() => {
+							newsEditingId = null;
+							showNewsForm = !showNewsForm;
+						}}
+					>
+						{showNewsForm ? 'Cancelar' : 'Agregar comunicado'}
+					</button>
+				</header>
+
+				{#if showNewsForm}
+					<form
+						method="POST"
+						action="?/addNews"
+						use:enhance={() => {
+							return async ({ result, update }) => {
+								await update();
+								if (result.type === 'success') showNewsForm = false;
+							};
+						}}
+					>
+						<input type="hidden" name="slug" value={editing.slug} />
+						<div class="grid">
+							<label>
+								Tipo
+								<select name="kind">
+									{#each data.options.kinds as kind (kind)}
+										<option value={kind}>{dogNewsKindLabels[kind]}</option>
+									{/each}
+								</select>
+							</label>
+							<label>
+								Fecha
+								<input name="date" type="date" required />
+							</label>
+						</div>
+
+						<label class="wide">
+							Título *
+							<input name="title" maxlength="160" required placeholder="Exámenes pendientes" />
+						</label>
+
+						<label class="wide">
+							Detalle *
+							<textarea
+								name="body"
+								rows="3"
+								required
+								placeholder="Qué está pasando y qué se necesita…"
+							></textarea>
+						</label>
+
+						<div class="news-photo">
+							<ImageUpload name="photo" folder="comunicados" label="Foto (opcional)" />
+						</div>
+
+						<label class="inline">
+							<input type="hidden" name="urgent" value="off" />
+							<input type="checkbox" name="urgent" value="on" />
+							Urgente (necesita ayuda)
+						</label>
+
+						<div class="actions">
+							<button class="primary" type="submit">Publicar</button>
+						</div>
+					</form>
+				{/if}
+
+				{#if currentNews.length === 0}
+					<p class="empty">Sin comunicados todavía.</p>
+				{:else}
+					<ul class="news-list">
+						{#each currentNews as item (item.id)}
+							<li>
+								{#if newsEditingId === item.id}
+									<form
+										method="POST"
+										action="?/updateNews"
+										use:enhance={() => {
+											return async ({ result, update }) => {
+												await update();
+												if (result.type === 'success') newsEditingId = null;
+											};
+										}}
+									>
+										<input type="hidden" name="slug" value={editing.slug} />
+										<input type="hidden" name="id" value={item.id} />
+										<div class="grid">
+											<label>
+												Tipo
+												<select name="kind" value={item.kind}>
+													{#each data.options.kinds as kind (kind)}
+														<option value={kind}>{dogNewsKindLabels[kind]}</option>
+													{/each}
+												</select>
+											</label>
+											<label>
+												Fecha
+												<input name="date" type="date" value={item.date} required />
+											</label>
+										</div>
+										<label class="wide">
+											Título *
+											<input name="title" maxlength="160" value={item.title} required />
+										</label>
+										<label class="wide">
+											Detalle *
+											<textarea name="body" rows="3" required>{item.body}</textarea>
+										</label>
+										<div class="news-photo">
+											{#key item.id}
+												<ImageUpload
+													name="photo"
+													folder="comunicados"
+													label="Foto (opcional)"
+													value={item.photo ?? ''}
+												/>
+											{/key}
+										</div>
+										<label class="inline">
+											<input type="hidden" name="urgent" value="off" />
+											<input
+												type="checkbox"
+												name="urgent"
+												value="on"
+												checked={item.urgent ?? false}
+											/>
+											Urgente (necesita ayuda)
+										</label>
+										<div class="actions">
+											<button class="primary" type="submit">Guardar</button>
+											<button
+												class="ghost"
+												type="button"
+												onclick={() => (newsEditingId = null)}
+											>
+												Cancelar
+											</button>
+										</div>
+									</form>
+								{:else}
+									<div class="news-row">
+										<div class="news-info">
+											<span class="news-meta">
+												{dogNewsKindEmoji[item.kind]}
+												{dogNewsKindLabels[item.kind]} · {item.date}
+												{#if item.urgent}<span class="tag urgent">Urgente</span>{/if}
+											</span>
+											<strong>{item.title}</strong>
+										</div>
+										<div class="row-actions">
+											<button
+												class="icon"
+												type="button"
+												title="Editar"
+												onclick={() => (newsEditingId = item.id)}
+											>
+												✎
+											</button>
+											<form method="POST" action="?/deleteNews" use:enhance>
+												<input type="hidden" name="slug" value={editing.slug} />
+												<input type="hidden" name="id" value={item.id} />
+												<button
+													class="icon danger"
+													type="submit"
+													title="Borrar"
+													onclick={(event) => {
+														if (!confirm('¿Borrar este comunicado? No se puede deshacer.')) {
+															event.preventDefault();
+														}
+													}}
+												>
+													🗑
+												</button>
+											</form>
+										</div>
+									</div>
+								{/if}
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</section>
+		{/if}
 	</section>
 {/if}
 
@@ -618,6 +823,80 @@
 
 	.icon.danger:hover {
 		border-color: #ef4444;
+		color: #b91c1c;
+	}
+
+	/* ---------- Comunicados (dentro del editor del perrito) ---------- */
+
+	.news-block {
+		margin-top: 1.5rem;
+		padding-top: 1.25rem;
+		border-top: 2px dashed #e2e5e9;
+	}
+
+	.news-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+	}
+
+	.news-head h3 {
+		margin: 0;
+		font-size: 1rem;
+	}
+
+	.news-block form {
+		margin-bottom: 0.75rem;
+	}
+
+	.news-photo {
+		margin: 0.75rem 0;
+	}
+
+	.news-block .empty {
+		padding: 1rem;
+	}
+
+	.news-list {
+		list-style: none;
+		display: grid;
+		gap: 0.5rem;
+		margin: 0;
+		padding: 0;
+	}
+
+	.news-list > li {
+		padding: 0.75rem;
+		border: 1px solid #e2e5e9;
+		border-radius: 0.5rem;
+		background: #fbfcfd;
+	}
+
+	.news-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.news-info {
+		display: grid;
+		gap: 0.125rem;
+		min-width: 0;
+	}
+
+	.news-meta {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.8125rem;
+		color: #5b6470;
+	}
+
+	.tag.urgent {
+		background: #fdecec;
 		color: #b91c1c;
 	}
 

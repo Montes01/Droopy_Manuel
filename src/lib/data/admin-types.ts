@@ -7,6 +7,7 @@
 import type {
 	BankAccount,
 	Dog,
+	DogNews,
 	DonationTier,
 	NewsItem,
 	Order,
@@ -100,6 +101,19 @@ export interface DogInput {
 	color?: string | null;
 	featured?: boolean;
 	sortOrder?: number;
+}
+
+/**
+ * Campos que acepta el panel al crear o editar un comunicado de un perrito.
+ * Todos opcionales porque al editar se envía solo lo que cambió.
+ */
+export interface DogNewsInput {
+	kind?: DogNews['kind'];
+	title?: string;
+	body?: string;
+	date?: string;
+	photo?: string | null;
+	urgent?: boolean;
 }
 
 export interface ShopCategoryInput {
@@ -207,6 +221,7 @@ export interface SiteStatsInput {
 export type {
 	BankAccount,
 	Dog,
+	DogNews,
 	DonationTier,
 	NewsItem,
 	Order,

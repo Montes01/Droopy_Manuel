@@ -7,6 +7,8 @@ import type {
 	ContactChannelInput,
 	Dog,
 	DogInput,
+	DogNews,
+	DogNewsInput,
 	DonationTier,
 	DonationTierInput,
 	NewsInput,
@@ -127,6 +129,23 @@ export async function deleteDog(slug: string): Promise<void> {
 
 export async function reorderDogs(slugs: string[]): Promise<Dog[]> {
 	return api.put<Dog[]>('/api/admin/dogs/order', { slugs });
+}
+
+/** Crea un comunicado en el perfil de un perrito. */
+export async function createDogNews(slug: string, input: DogNewsInput): Promise<DogNews> {
+	return api.post<DogNews>(`/api/admin/dogs/${encodeURIComponent(slug)}/news`, input);
+}
+
+export async function updateDogNews(
+	slug: string,
+	id: number,
+	input: DogNewsInput
+): Promise<DogNews> {
+	return api.patch<DogNews>(`/api/admin/dogs/${encodeURIComponent(slug)}/news/${id}`, input);
+}
+
+export async function deleteDogNews(slug: string, id: number): Promise<void> {
+	await api.delete(`/api/admin/dogs/${encodeURIComponent(slug)}/news/${id}`);
 }
 
 // ------------------------------------------------------------------ Tienda

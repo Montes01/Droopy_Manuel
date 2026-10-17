@@ -1,9 +1,9 @@
 import { fail } from '@sveltejs/kit';
 import { ApiRequestError } from '#lib/api/client';
 import { serverApi } from '#lib/api/server';
-import type { DogInput } from '#lib/data/admin-types';
-import type { Dog } from '#lib/data/types';
-import { DOG_STATUSES } from '#lib/data/types';
+import type { DogInput, DogNewsInput } from '#lib/data/admin-types';
+import type { Dog, DogNews } from '#lib/data/types';
+import { DOG_NEWS_KINDS, DOG_STATUSES } from '#lib/data/types';
 import type { Actions, PageServerLoad } from './$types';
 
 /**
@@ -21,13 +21,28 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		dogs = [];
 	}
 
+	let news: DogNews[] = [];
+	try {
+		news = await serverApi.get<DogNews[]>('/api/dogs/news', cookies);
+	} catch {
+		news = [];
+	}
+
+	// Comunicados agrupados por perrito, listos para el editor.
+	const newsByDog: Record<string, DogNews[]> = {};
+	for (const item of news) {
+		(newsByDog[item.dogSlug] ??= []).push(item);
+	}
+
 	return {
 		dogs,
+		newsByDog,
 		options: {
 			statuses: [...DOG_STATUSES],
 			sizes: ['pequeño', 'mediano', 'grande'],
 			sexes: ['macho', 'hembra'],
-			energies: ['tranquilo', 'moderado', 'juguetón']
+			energies: ['tranquilo', 'moderado', 'juguetón'],
+			kinds: [...DOG_NEWS_KINDS]
 		}
 	};
 };
@@ -92,6 +107,31 @@ function readDogForm(form: FormData): DogInput {
 			.map((trait) => trait.trim())
 			.filter(Boolean);
 	}
+
+	return input;
+}
+
+/** Lee un comunicado desde el formulario (mismo criterio: solo lo que viene). */
+function readNewsForm(form: FormData): DogNewsInput {
+	const input: DogNewsInput = {};
+
+	const text = (name: string): string | undefined => {
+		const value = form.get(name);
+		if (value === null) return undefined;
+		const trimmed = String(value).trim();
+		return trimmed === '' ? undefined : trimmed;
+	};
+
+	if (form.has('kind')) input.kind = text('kind') as DogNewsInput['kind'];
+	if (form.has('title')) input.title = text('title');
+	if (form.has('body')) input.body = text('body');
+	if (form.has('date')) input.date = text('date');
+	if (form.has('photo')) input.photo = text('photo') ?? null;
+
+	// El formulario manda un hidden "off" y el checkbox "on" cuando está
+	// marcado, así desmarcar "urgente" también cuenta como cambio.
+	const urgent = form.getAll('urgent').map(String);
+	if (urgent.length > 0) input.urgent = urgent.includes('on');
 
 	return input;
 }
@@ -183,6 +223,61 @@ export const actions: Actions = {
 			return { success: true, message: 'Orden actualizado.' };
 		} catch (error) {
 			return fail(400, { error: actionError(error, 'No se pudo reordenar.') });
+		}
+	},
+
+	/** Agrega un comunicado al perfil de un perrito. */
+	addNews: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		if (!slug) return fail(400, { error: 'Falta el perrito del comunicado.' });
+
+		try {
+			await serverApi.post<DogNews>(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/news`,
+				cookies,
+				readNewsForm(form)
+			);
+			return { success: true, message: 'Comunicado publicado.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo crear el comunicado.') });
+		}
+	},
+
+	/** Edita un comunicado existente. */
+	updateNews: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		const id = String(form.get('id') ?? '').trim();
+		if (!slug || !id) return fail(400, { error: 'Falta el comunicado a editar.' });
+
+		try {
+			await serverApi.patch<DogNews>(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/news/${encodeURIComponent(id)}`,
+				cookies,
+				readNewsForm(form)
+			);
+			return { success: true, message: 'Comunicado actualizado.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo actualizar el comunicado.') });
+		}
+	},
+
+	/** Borra un comunicado. La API exige rol admin. */
+	deleteNews: async ({ request, cookies }) => {
+		const form = await request.formData();
+		const slug = String(form.get('slug') ?? '').trim();
+		const id = String(form.get('id') ?? '').trim();
+		if (!slug || !id) return fail(400, { error: 'Falta el comunicado a borrar.' });
+
+		try {
+			await serverApi.delete(
+				`/api/admin/dogs/${encodeURIComponent(slug)}/news/${encodeURIComponent(id)}`,
+				cookies
+			);
+			return { success: true, message: 'Comunicado eliminado.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo borrar el comunicado.') });
 		}
 	}
 };

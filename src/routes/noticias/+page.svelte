@@ -1,5 +1,6 @@
 <script lang="ts">
 	import NewsCard from '#lib/components/NewsCard.svelte';
+	import { untrack } from 'svelte';
 	import { getNewsPage } from '#lib/api/news';
 	import type { NewsItem } from '#lib/data/types';
 	import { site, pageTitle } from '#lib/site';
@@ -10,8 +11,8 @@
 
 	const PAGE_SIZE = 6;
 
-	let items = $state<NewsItem[]>(data.news);
-	let hasMore = $state(data.hasMore);
+	let items = $state<NewsItem[]>(untrack(() => data.news));
+	let hasMore = $state(untrack(() => data.hasMore));
 	let loading = $state(false);
 
 	let sentinel: HTMLElement | undefined = $state();

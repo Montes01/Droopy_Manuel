@@ -1,7 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { ApiRequestError } from '#lib/api/client';
 import { serverApi } from '#lib/api/server';
-import type { Order, OrderPage, OrderStatus, PaymentStatus } from '#lib/data/types';
+import type { Order, OrderStatus, PaymentStatus } from '#lib/data/types';
+import type { OrderPage } from '#lib/data/admin-types';
 import type { Actions, PageServerLoad } from './$types';
 
 /**

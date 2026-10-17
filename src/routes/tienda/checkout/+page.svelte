@@ -8,6 +8,7 @@
 	import { pageTitle } from '#lib/site';
 	import { useCart } from '#lib/stores/cart.svelte';
 	import { useContact } from '#lib/stores/contact.svelte';
+	import { untrack } from 'svelte';
 
 	const title = pageTitle('Finalizar compra');
 	const cart = useCart();
@@ -16,7 +17,7 @@
 	let { data } = $props();
 
 	/** Cuentas para transferir, traídas de la API por el loader. */
-	const bankAccounts: BankAccount[] = data.accounts;
+	const bankAccounts: BankAccount[] = untrack(() => data.accounts);
 
 	type Form = OrderCustomer;
 

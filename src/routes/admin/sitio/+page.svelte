@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
@@ -31,7 +32,7 @@
 	}
 
 	/** El número de WhatsApp se edita solo con dígitos. */
-	let whatsappInput = $state(data.contact.whatsappNumber);
+	let whatsappInput = $state(untrack(() => data.contact.whatsappNumber));
 
 	/** Perks como texto, una línea cada uno, para el textarea. */
 	function perksText(perks: string[]): string {
@@ -593,10 +594,6 @@
 		width: 5rem;
 	}
 
-	.price-input {
-		width: 7rem;
-	}
-
 	.hint {
 		margin: 0.5rem 0;
 		font-size: 0.8125rem;
@@ -692,11 +689,6 @@
 		background: #ecfdf5;
 		color: #047857;
 		font-size: 0.75rem;
-	}
-
-	.inline-edit {
-		display: flex;
-		gap: 0.25rem;
 	}
 
 	.tier-edit {

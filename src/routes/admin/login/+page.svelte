@@ -35,6 +35,7 @@
 
 		<label>
 			Correo
+			<!-- svelte-ignore a11y_autofocus -->
 			<input
 				type="email"
 				name="email"

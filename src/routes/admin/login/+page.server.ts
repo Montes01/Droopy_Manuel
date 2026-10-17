@@ -1,4 +1,4 @@
-import { dev } from '$app/environment';
+import { dev } from '$app/env';
 import { fail, redirect } from '@sveltejs/kit';
 import { ApiRequestError } from '#lib/api/client';
 import { loginForServer } from '#lib/api/admin';

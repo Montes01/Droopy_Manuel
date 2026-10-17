@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
+
 	/**
 	 * Subida de imagen a Vercel Blob para el panel.
 	 *
@@ -17,7 +19,7 @@
 
 	let { name = 'photo', value = '', folder = 'admin', label = 'Foto' }: Props = $props();
 
-	let current = $state(value);
+	let current = $state(untrack(() => value));
 	let uploading = $state(false);
 	let error = $state<string | null>(null);
 

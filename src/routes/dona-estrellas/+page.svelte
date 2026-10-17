@@ -4,6 +4,7 @@
 	import type { BankAccount, Dog } from '#lib/data/types';
 	import { pageTitle, site } from '#lib/site';
 	import { useContact } from '#lib/stores/contact.svelte';
+	import { untrack } from 'svelte';
 
 	const title = pageTitle('Dona estrellas');
 
@@ -12,9 +13,9 @@
 	let { data } = $props();
 
 	// Todo viene del loader (+page.ts) y, por debajo, de la API.
-	const bankAccounts: BankAccount[] = data.accounts;
-	const donationTargets: Dog[] = data.dogs;
-	const aboutBlurb: string = data.aboutBlurb;
+	const bankAccounts: BankAccount[] = untrack(() => data.accounts);
+	const donationTargets: Dog[] = untrack(() => data.dogs);
+	const aboutBlurb: string = untrack(() => data.aboutBlurb);
 
 	let open = $state(false);
 	let selectedSlug: string | null = $state(null);

@@ -6,6 +6,7 @@
 	import { site } from '#lib/site';
 	import { initCart } from '#lib/stores/cart.svelte';
 	import { initContact } from '#lib/stores/contact.svelte';
+	import { untrack } from 'svelte';
 
 	let { children, data } = $props();
 
@@ -13,7 +14,7 @@
 	const cart = initCart();
 
 	// Contacto (WhatsApp, redes) para todo el árbol.
-	initContact(data.contact);
+	initContact(untrack(() => data.contact));
 
 	// Las opciones de entrega vienen de la API: el carrito no guarda copia
 	// del costo de envío, lo lee de aquí.

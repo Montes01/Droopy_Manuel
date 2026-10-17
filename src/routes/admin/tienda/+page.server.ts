@@ -1,7 +1,8 @@
 import { fail } from '@sveltejs/kit';
 import { ApiRequestError } from '#lib/api/client';
 import { serverApi } from '#lib/api/server';
-import type { ShopCategory, ShopItem, ShopVariantInput } from '#lib/data/types';
+import type { ShopCategory, ShopItem } from '#lib/data/types';
+import type { ShopVariantInput } from '#lib/data/admin-types';
 import type { Actions, PageServerLoad } from './$types';
 
 /**

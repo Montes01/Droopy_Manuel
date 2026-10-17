@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
+	import { untrack } from 'svelte';
 	import type { ActionData, PageData } from './$types';
 	import type { Order } from '#lib/data/types';
 
@@ -10,9 +11,9 @@
 	let openOrder = $state<Order | null>(null);
 
 	/** Filtros del formulario, inicializados desde la URL. */
-	let q = $state(data.filters.q);
-	let status = $state(data.filters.status);
-	let paymentStatus = $state(data.filters.paymentStatus);
+	let q = $state(untrack(() => data.filters.q));
+	let status = $state(untrack(() => data.filters.status));
+	let paymentStatus = $state(untrack(() => data.filters.paymentStatus));
 
 	const statusLabels: Record<string, string> = {
 		pendiente: 'Pendiente',
@@ -51,14 +52,14 @@
 		if (paymentStatus) params.set('paymentStatus', paymentStatus);
 		if (q.trim()) params.set('q', q.trim());
 		const query = params.toString();
-		goto(`/admin/pedidos${query ? `?${query}` : ''}`, { keepFocus: true });
+		goto(`/admin/pedidos${query ? `?${query}` : ''}`, { reset: false });
 	}
 
 	function clearFilters() {
 		q = '';
 		status = '';
 		paymentStatus = '';
-		goto('/admin/pedidos', { keepFocus: true });
+		goto('/admin/pedidos', { reset: false });
 	}
 
 	/** Copia el resumen del pedido como texto, para pegarlo en WhatsApp. */
@@ -371,8 +372,7 @@
 	}
 
 	input,
-	select,
-	textarea {
+	select {
 		padding: 0.5rem 0.625rem;
 		border: 1px solid #ccd2d9;
 		border-radius: 0.375rem;

@@ -316,12 +316,9 @@
 		.nav a {
 			padding-inline: 0.875rem;
 			color: #fffdf8;
-			text-shadow:
-				-1px -1px 0 #7a3f16,
-				1px -1px 0 #7a3f16,
-				-1px 1px 0 #7a3f16,
-				1px 1px 0 #7a3f16,
-				0 3px 10px rgb(122 63 22 / 0.6);
+			-webkit-text-stroke: 2px #7a3f16;
+			paint-order: stroke fill;
+			text-shadow: 0 3px 10px rgb(122 63 22 / 0.6);
 		}
 
 		.nav a:hover {

@@ -112,12 +112,9 @@
 		font-size: 5rem;
 		line-height: 1;
 		color: #fffdf8;
-		text-shadow:
-			-2px -2px 0 #7a3f16,
-			2px -2px 0 #7a3f16,
-			-2px 2px 0 #7a3f16,
-			2px 2px 0 #7a3f16,
-			0 6px 20px rgb(122 63 22 / 0.6);
+		-webkit-text-stroke: 4px #7a3f16;
+		paint-order: stroke fill;
+		text-shadow: 0 6px 20px rgb(122 63 22 / 0.6);
 	}
 
 	.dog-paw {
@@ -169,12 +166,9 @@
 		font-size: 1.9rem;
 		line-height: 1.1;
 		color: var(--dog);
-		text-shadow:
-			-2px -2px 0 var(--dog-ink, var(--dog)),
-			2px -2px 0 var(--dog-ink, var(--dog)),
-			-2px 2px 0 var(--dog-ink, var(--dog)),
-			2px 2px 0 var(--dog-ink, var(--dog)),
-			0 6px 20px rgb(0 0 0 / 0.6);
+		-webkit-text-stroke: 4px var(--dog-ink, var(--dog));
+		paint-order: stroke fill;
+		text-shadow: 0 6px 20px rgb(0 0 0 / 0.6);
 	}
 
 	.dog-name.flat {

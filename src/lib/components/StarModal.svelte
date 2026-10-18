@@ -237,10 +237,9 @@
 		font-family: var(--font-brand);
 		font-size: 1.5rem;
 		color: #fffdf8;
-		text-shadow:
-			-1px -1px 0 #7a3f16,
-			1px 1px 0 #7a3f16,
-			0 2px 6px rgb(122 63 22 / 0.6);
+		-webkit-text-stroke: 2px #7a3f16;
+		paint-order: stroke fill;
+		text-shadow: 0 2px 6px rgb(122 63 22 / 0.6);
 		border-radius: 50%;
 		background: linear-gradient(135deg, #ffd9a0, #ffb3c7 45%, #b8e0ff);
 		overflow: clip;

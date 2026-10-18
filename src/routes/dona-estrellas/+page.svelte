@@ -102,12 +102,9 @@
 		font-size: clamp(2rem, 8vw, 3rem);
 		line-height: 1.15;
 		margin: 1.5rem 0 0.75rem;
-		text-shadow:
-			-2px -2px 0 #7a3f16,
-			2px -2px 0 #7a3f16,
-			-2px 2px 0 #7a3f16,
-			2px 2px 0 #7a3f16,
-			0 6px 20px rgb(122 63 22 / 0.6);
+		-webkit-text-stroke: 4px #7a3f16;
+		paint-order: stroke fill;
+		text-shadow: 0 6px 20px rgb(122 63 22 / 0.6);
 	}
 
 	.intro {
@@ -127,12 +124,9 @@
 		font-size: clamp(1.375rem, 5vw, 1.875rem);
 		line-height: 1.2;
 		margin-bottom: 1rem;
-		text-shadow:
-			-2px -2px 0 #7a3f16,
-			2px -2px 0 #7a3f16,
-			-2px 2px 0 #7a3f16,
-			2px 2px 0 #7a3f16,
-			0 6px 20px rgb(122 63 22 / 0.6);
+		-webkit-text-stroke: 4px #7a3f16;
+		paint-order: stroke fill;
+		text-shadow: 0 6px 20px rgb(122 63 22 / 0.6);
 	}
 
 	/* --- Cuentas --- */
@@ -204,12 +198,9 @@
 		text-wrap: balance;
 		font-size: clamp(1.375rem, 5vw, 1.875rem);
 		line-height: 1.2;
-		text-shadow:
-			-2px -2px 0 #7a3f16,
-			2px -2px 0 #7a3f16,
-			-2px 2px 0 #7a3f16,
-			2px 2px 0 #7a3f16,
-			0 6px 20px rgb(122 63 22 / 0.6);
+		-webkit-text-stroke: 4px #7a3f16;
+		paint-order: stroke fill;
+		text-shadow: 0 6px 20px rgb(122 63 22 / 0.6);
 	}
 
 	.thanks-foot {

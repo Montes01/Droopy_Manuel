@@ -87,12 +87,9 @@
 		line-height: 1.15;
 		margin: 1.5rem 0;
 		padding-inline: 3rem;
-		text-shadow:
-			-2px -2px 0 #7a3f16,
-			2px -2px 0 #7a3f16,
-			-2px 2px 0 #7a3f16,
-			2px 2px 0 #7a3f16,
-			0 6px 20px rgb(122 63 22 / 0.6);
+		-webkit-text-stroke: 4px #7a3f16;
+		paint-order: stroke fill;
+		text-shadow: 0 6px 20px rgb(122 63 22 / 0.6);
 	}
 
 	.tagline > span:first-child {

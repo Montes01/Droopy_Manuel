@@ -124,7 +124,7 @@
 		width: auto;
 	}
 
-	@media (max-width: 22.4375rem) {
+	@media (max-width: 89.375rem) {
 		.brand-title {
 			display: none;
 		}

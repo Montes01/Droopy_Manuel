@@ -2,7 +2,7 @@
 	import { enhance } from '$app/forms';
 	import type { ActionData, PageData } from './$types';
 	import ImageUpload from '#lib/components/ImageUpload.svelte';
-	import type { Dog, DogVaccine } from '#lib/data/admin-types';
+	import type { Dog, DogNews, DogVaccine } from '#lib/data/admin-types';
 	import { DOG_STATUSES, dogStatusLabels } from '#lib/data/dog-status';
 	import { dogNewsKindEmoji, dogNewsKindLabels } from '#lib/data/dog-news-labels';
 	import { accessorySuggestions, vaccineSuggestions } from '#lib/data/dog-health-labels';
@@ -17,6 +17,10 @@
 	/** Comunicados del perrito en edición (solo para uno ya creado). */
 	let newsEditingId = $state<number | null>(null);
 	let showNewsForm = $state(false);
+	/** Tipo del comunicado nuevo: solo el tratamiento pide fecha final. */
+	let newsKind = $state<DogNews['kind']>('general');
+	/** Tipo del comunicado en edición (para mostrar la fecha final). */
+	let newsEditingKind = $state<DogNews['kind']>('general');
 	let currentNews = $derived(editing ? (data.newsByDog[editing.slug] ?? []) : []);
 
 	/** Salud del perrito en edición (solo para uno ya creado). */
@@ -300,6 +304,7 @@
 						onclick={() => {
 							newsEditingId = null;
 							showNewsForm = !showNewsForm;
+							if (showNewsForm) newsKind = 'general';
 						}}
 					>
 						{showNewsForm ? 'Cancelar' : 'Agregar comunicado'}
@@ -313,7 +318,10 @@
 						use:enhance={() => {
 							return async ({ result, update }) => {
 								await update();
-								if (result.type === 'success') showNewsForm = false;
+								if (result.type === 'success') {
+									showNewsForm = false;
+									newsKind = 'general';
+								}
 							};
 						}}
 					>
@@ -321,16 +329,22 @@
 						<div class="grid">
 							<label>
 								Tipo
-								<select name="kind">
+								<select name="kind" bind:value={newsKind}>
 									{#each data.options.kinds as kind (kind)}
 										<option value={kind}>{dogNewsKindLabels[kind]}</option>
 									{/each}
 								</select>
 							</label>
 							<label>
-								Fecha
+								{newsKind === 'tratamiento' ? 'Inicio' : 'Fecha'}
 								<input name="date" type="date" required />
 							</label>
+							{#if newsKind === 'tratamiento'}
+								<label>
+									Fecha final
+									<input name="endDate" type="date" />
+								</label>
+							{/if}
 						</div>
 
 						<label class="wide">
@@ -386,16 +400,22 @@
 										<div class="grid">
 											<label>
 												Tipo
-												<select name="kind" value={item.kind}>
+												<select name="kind" bind:value={newsEditingKind}>
 													{#each data.options.kinds as kind (kind)}
 														<option value={kind}>{dogNewsKindLabels[kind]}</option>
 													{/each}
 												</select>
 											</label>
 											<label>
-												Fecha
+												{newsEditingKind === 'tratamiento' ? 'Inicio' : 'Fecha'}
 												<input name="date" type="date" value={item.date} required />
 											</label>
+											{#if newsEditingKind === 'tratamiento'}
+												<label>
+													Fecha final
+													<input name="endDate" type="date" value={item.endDate ?? ''} />
+												</label>
+											{/if}
 										</div>
 										<label class="wide">
 											Título *
@@ -441,7 +461,9 @@
 										<div class="news-info">
 											<span class="news-meta">
 												{dogNewsKindEmoji[item.kind]}
-												{dogNewsKindLabels[item.kind]} · {item.date}
+												{dogNewsKindLabels[item.kind]} · {item.kind === 'tratamiento' && item.endDate
+													? `${item.date} → ${item.endDate}`
+													: item.date}
 												{#if item.urgent}<span class="tag urgent">Urgente</span>{/if}
 											</span>
 											<strong>{item.title}</strong>
@@ -451,7 +473,10 @@
 												class="icon"
 												type="button"
 												title="Editar"
-												onclick={() => (newsEditingId = item.id)}
+												onclick={() => {
+													newsEditingId = item.id;
+													newsEditingKind = item.kind;
+												}}
 											>
 												✏️
 											</button>

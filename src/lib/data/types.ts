@@ -99,6 +99,11 @@ export interface DogNews {
 	body: string;
 	/** Fecha ISO (YYYY-MM-DD). Ordena el feed: más reciente primero. */
 	date: ISODate;
+	/**
+	 * Fecha final. Solo la usan los comunicados de tipo `tratamiento`: marca
+	 * cuándo termina (o terminó) el tratamiento. Ausente = sin fecha de cierre.
+	 */
+	endDate?: ISODate;
 	/** Ruta en /static cuando haya foto real. Null = sin imagen. */
 	photo: PhotoPath;
 	/** true = necesita ayuda urgente (se resalta en el perfil). */

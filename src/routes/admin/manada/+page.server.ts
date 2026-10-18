@@ -145,6 +145,7 @@ function readNewsForm(form: FormData): DogNewsInput {
 	if (form.has('title')) input.title = text('title');
 	if (form.has('body')) input.body = text('body');
 	if (form.has('date')) input.date = text('date');
+	if (form.has('endDate')) input.endDate = text('endDate') ?? null;
 	if (form.has('photo')) input.photo = text('photo') ?? null;
 
 	// El formulario manda un hidden "off" y el checkbox "on" cuando está

@@ -42,7 +42,13 @@
 							{dogNewsKindEmoji[item.kind]} {dogNewsKindLabels[item.kind]}
 						</span>
 						{#if item.urgent}<span class="news-urgent">Urgente</span>{/if}
-						<time datetime={item.date}>{formatNewsDate(item.date)}</time>
+						<time datetime={item.date}>
+							{#if item.kind === 'tratamiento' && item.endDate}
+								{formatNewsDate(item.date)} – {formatNewsDate(item.endDate)}
+							{:else}
+								{formatNewsDate(item.date)}
+							{/if}
+						</time>
 					</div>
 					<p class="news-title">{item.title}</p>
 					<p class="news-body">{item.body}</p>

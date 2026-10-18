@@ -115,6 +115,8 @@ export interface DogNewsInput {
 	title?: string;
 	body?: string;
 	date?: string;
+	/** Fecha final: solo se aplica cuando `kind` es `tratamiento`. */
+	endDate?: string | null;
 	photo?: string | null;
 	urgent?: boolean;
 }

@@ -31,6 +31,19 @@
 	});
 
 	/**
+	 * Congela el scroll del fondo mientras el perrito está abierto, y lo
+	 * devuelve a como estaba al cerrar.
+	 */
+	$effect(() => {
+		if (!dog) return;
+		const previous = document.body.style.overflow;
+		document.body.style.overflow = 'hidden';
+		return () => {
+			document.body.style.overflow = previous;
+		};
+	});
+
+	/**
 	 * Carga los comunicados al abrir. El modal no es una página, así que los
 	 * pide a la capa API; una carga vieja se descarta si cambia el perrito.
 	 */
@@ -169,7 +182,7 @@
 		--dog: #7a3f16;
 		width: 100%;
 		max-width: 34rem;
-		max-height: 1000px;
+		max-height: min(90vh, 1000px);
 		overflow-y: auto;
 		border-radius: 1.5rem;
 		background: #ffffff;

@@ -362,6 +362,17 @@ export interface NewsPage {
 	hasMore: boolean;
 }
 
+/**
+ * Filtros del feed de noticias. Espejo de `Server/src/types.ts`: los aplica el
+ * backend para poder paginar el conjunto filtrado.
+ */
+export interface NewsFilter {
+	/** Búsqueda de texto libre: título, bajada, cuerpo y etiquetas. */
+	q?: string;
+	/** Categoría exacta. */
+	category?: NewsCategory;
+}
+
 /** Categoría de noticia con su etiqueta visible. */
 export interface NewsCategoryInfo {
 	slug: NewsCategory;

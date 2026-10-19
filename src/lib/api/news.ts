@@ -1,4 +1,4 @@
-import type { NewsCategoryInfo, NewsItem, NewsPage } from '#lib/data/types';
+import type { NewsCategoryInfo, NewsFilter, NewsItem, NewsPage } from '#lib/data/types';
 import { api } from './client';
 
 /** Capa de acceso a datos de noticias. Todo viene del backend. */
@@ -19,9 +19,20 @@ export async function getNewsItem(slug: string): Promise<NewsItem | null> {
 /**
  * Página del feed para el scroll infinito.
  *
- * `offset` es cuántos elementos ya se mostraron. Devuelve el trozo pedido y
- * `hasMore` para que la UI sepa si conviene seguir observando el centinela.
+ * `offset` es cuántos elementos ya se mostraron. `filter` acota el feed por
+ * texto (`q`) y/o categoría. Devuelve el trozo pedido y `hasMore` para que la
+ * UI sepa si conviene seguir observando el centinela.
  */
-export async function getNewsPage(offset = 0, limit = 6): Promise<NewsPage> {
-	return api.get<NewsPage>(`/api/news?offset=${offset}&limit=${limit}`);
+export async function getNewsPage(
+	offset = 0,
+	limit = 6,
+	filter: NewsFilter = {}
+): Promise<NewsPage> {
+	const params = new URLSearchParams({ offset: String(offset), limit: String(limit) });
+
+	const q = filter.q?.trim();
+	if (q) params.set('q', q);
+	if (filter.category) params.set('category', filter.category);
+
+	return api.get<NewsPage>(`/api/news?${params.toString()}`);
 }

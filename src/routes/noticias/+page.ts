@@ -1,6 +1,11 @@
-import { getNewsPage } from '#lib/api/news';
+import { getNewsCategories, getNewsPage } from '#lib/api/news';
 
+/** Primera página del feed + categorías para los filtros. */
 export async function load() {
-	const { items, hasMore } = await getNewsPage(0, 6);
-	return { news: items, hasMore };
+	const [{ items, hasMore }, categories] = await Promise.all([
+		getNewsPage(0, 15),
+		getNewsCategories()
+	]);
+
+	return { news: items, hasMore, categories };
 }

@@ -1,31 +1,46 @@
 <script lang="ts">
 	import type { NewsItem } from '#lib/data/types';
-	import { categoryLabels } from '#lib/data/news-labels';
-	import { site, pageTitle } from '#lib/site';
+	import { categoryLabels, categoryEmoji } from '#lib/data/news-labels';
 
 	interface Props {
 		item: NewsItem;
 	}
 
 	let { item }: Props = $props();
+
+	const avatarEmoji = $derived(item.emoji || categoryEmoji[item.category] || '🐾');
 </script>
 
-<a class="news-item glass" href={`/noticias/${item.slug}`}>
-	<div class="news-cover" aria-hidden="true">
-		{#if item.photo}
-			<img src={item.photo} alt="" loading="lazy" decoding="async" />
-		{:else}
-			<span class="news-emoji">{item.emoji || '🐾'}</span>
-		{/if}
-	</div>
-	<div class="news-body">
-		<p class="news-meta">
-			<span class="news-cat">{categoryLabels[item.category]}</span>
+<a class="post" href={`/noticias/${item.slug}`}>
+	<span class="avatar" aria-hidden="true">{avatarEmoji}</span>
+
+	<div class="post-body">
+		<p class="post-head">
+			<span class="post-name">{categoryLabels[item.category]}</span>
+			<span class="post-handle">@{item.category}</span>
+			<span class="post-dot" aria-hidden="true">·</span>
 			<time datetime={item.date}>{formatDate(item.date)}</time>
 		</p>
-		<h3 class="news-title">{item.title}</h3>
-		<p class="news-excerpt">{item.excerpt}</p>
-		<p class="news-more">Leer más →</p>
+
+		<h3 class="post-title">{item.title}</h3>
+
+		{#if item.photo}
+			<div class="post-media">
+				<img src={item.photo} alt="" loading="lazy" decoding="async" />
+			</div>
+		{/if}
+
+		<p class="post-text">{item.excerpt}</p>
+
+		{#if item.tags.length > 0}
+			<ul class="post-tags">
+				{#each item.tags as tag (tag)}
+					<li class="post-tag">{tag}</li>
+				{/each}
+			</ul>
+		{/if}
+
+		<p class="post-more">Leer más →</p>
 	</div>
 </a>
 
@@ -41,91 +56,143 @@
 </script>
 
 <style>
-	.news-item {
+	.post {
 		display: block;
-		border-radius: 1.25rem;
-		border: 1px solid rgb(255 255 255 / 0.6);
-		overflow: hidden;
+		position: relative;
+		padding: 1rem;
 		color: inherit;
 		text-decoration: none;
-		box-shadow: 0 0.5rem 1.25rem rgb(122 63 22 / 0.15);
 		scroll-margin-top: 5rem;
-		transition: transform 0.25s ease;
+		transition: background 0.2s ease;
 	}
 
-	.news-cover {
-		display: flex;
+	.post:not(:last-child) {
+		border-bottom: 1px solid rgb(122 63 22 / 0.12);
+	}
+
+	.avatar {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		aspect-ratio: 16 / 7;
-		background: linear-gradient(135deg, #ffd9a0, #ffb3c7 45%, #b8e0ff);
-	}
-
-	.news-cover img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
-	.news-emoji {
-		font-size: 3.5rem;
+		width: 2.75rem;
+		height: 2.75rem;
+		font-size: 1.5rem;
 		line-height: 1;
-		filter: drop-shadow(0 4px 10px rgb(122 63 22 / 0.35));
+		border-radius: 50%;
+		background: linear-gradient(135deg, #ffd9a0, #ffb3c7 45%, #b8e0ff);
+		box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.6);
 	}
 
-	.news-body {
-		padding: 1.25rem;
+	.post-body {
+		min-width: 0;
 	}
 
-	.news-meta {
+	.post-head {
 		display: flex;
-		align-items: center;
-		gap: 0.75rem;
-		font-size: 0.8125rem;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: 0.3125rem;
+		padding-right: 3rem;
+		font-size: 0.9375rem;
+		line-height: 1.3;
+	}
+
+	.post-name {
 		font-weight: 700;
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
-		opacity: 0.7;
+		color: #7a3f16;
 	}
 
-	.news-cat {
-		padding: 0.25rem 0.75rem;
-		border-radius: 999px;
-		background: #7a3f16;
-		color: #fffdf8;
+	.post-handle,
+	.post-dot,
+	.post-head time {
+		color: #a1876f;
 	}
 
-	.news-title {
+	.post-title {
 		font-family: var(--font-brand);
 		font-weight: 400;
-		font-size: clamp(1.5rem, 5vw, 1.875rem);
+		font-size: clamp(1.25rem, 4.5vw, 1.5rem);
 		line-height: 1.2;
 		color: #7a3f16;
-		margin-top: 0.5rem;
+		margin-top: 0.1875rem;
+		padding-right: 3rem;
 		text-wrap: balance;
 	}
 
-	.news-excerpt {
-		margin-top: 0.5rem;
-		font-size: 1.0625rem;
+	.post-text {
+		margin-top: 0.25rem;
+		font-size: 1rem;
+		line-height: 1.5;
+		color: #4a3527;
 		text-wrap: pretty;
 	}
 
-	.news-more {
+	.post-media {
 		margin-top: 0.75rem;
+		max-width: 100%;
+		max-height: 280px;
+		border-radius: 1rem;
+		overflow: hidden;
+		border: 1px solid rgb(122 63 22 / 0.12);
+		background: linear-gradient(135deg, #ffd9a0, #ffb3c7 45%, #b8e0ff);
+	}
+
+	.post-media img {
+		width: 100%;
+		height: auto;
+		max-height: 280px;
+		object-fit: cover;
+	}
+
+	.post-tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.375rem;
+		margin-top: 0.625rem;
+		list-style: none;
+		padding: 0;
+	}
+
+	.post-tag {
+		padding: 0.125rem 0.625rem;
+		border-radius: 999px;
+		border: 1px solid rgb(122 63 22 / 0.18);
+		background: rgb(122 63 22 / 0.1);
+		font-size: 0.8125rem;
+		font-weight: 600;
+		line-height: 1.6;
+		color: #b7791f;
+	}
+
+	.post-more {
+		margin-top: 0.5rem;
 		font-family: var(--font-brand);
-		font-size: 1.125rem;
+		font-size: 1.0625rem;
 		color: #b7791f;
 	}
 
 	@media (hover: hover) {
-		.news-item:hover {
-			transform: translateY(-0.25rem);
+		.post:hover {
+			background: rgb(255 255 255 / 0.55);
 		}
 
-		.news-item:focus-visible {
+		.post:focus-visible {
 			outline: 3px solid #7a3f16;
-			outline-offset: 2px;
+			outline-offset: -3px;
+		}
+	}
+
+	@media (min-width: 48rem) {
+		.post {
+			padding: 1.875rem;
+		}
+
+		.avatar {
+			top: 1.875rem;
+			right: 1.875rem;
 		}
 	}
 </style>

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import HomeCard from '#lib/components/HomeCard.svelte';
+	import DogCarousel from '#lib/components/DogCarousel.svelte';
 	import { site, pageTitle } from '#lib/site';
-	import type { NewsItem } from '#lib/data/types';
+	import type { Dog, NewsItem } from '#lib/data/types';
 
 	const title = pageTitle('Home');
 
@@ -9,6 +10,9 @@
 
 	/** Últimas noticias para el bloque de la portada (lo trae +page.ts). */
 	let news = $derived<NewsItem[]>(data.news);
+
+	/** Perritos destacados del carrusel (lo trae +page.ts). */
+	let pack = $derived<Dog[]>(data.pack);
 </script>
 
 <svelte:head>
@@ -22,7 +26,7 @@
 </svelte:head>
 
 <main class="container">
-	<p class="tagline">Un amor que ilumina vidas de 4 patas</p>
+	<DogCarousel dogs={pack} href="/manada" />
 	<div class="bento">
 	<section class="hero" aria-labelledby="hero-title">
 		<img
@@ -37,41 +41,35 @@
 		</div>
 	</section>
 
-	<p class="cards-title">✨ Nuestra historia y nuestra manada ✨</p>
-	<section aria-label="Proyecto destacado">
-		<HomeCard
-			href="/project"
-			src="/cards/soy-droopy.png"
-			alt="Soy Droopy Manuel"
-			label="Soy Droopy Manuel — ver proyecto"
-		/>
-	</section>
-	<section aria-label="Manada comunitaria">
-		<HomeCard
-			href="/manada"
-			src="/cards/manada-comunitaria.jpg"
-			alt="Manada Comunitaria"
-			label="Manada Comunitaria — ver manada"
-		/>
-	</section>
+	<div class="side">
+		<p class="cards-title">✨ Nuestra historia y nuestra manada ✨</p>
+		<section aria-label="Proyecto destacado">
+			<HomeCard
+				href="/project"
+				src="/cards/soy-droopy.png"
+				alt="Soy Droopy Manuel"
+				label="Soy Droopy Manuel — ver proyecto"
+			/>
+		</section>
+		<section class="help" aria-labelledby="help-title">
+			<p class="cards-title help-title" id="help-title">🐾 ¿Cómo puedes ayudar? ⭐</p>
+			<div class="help-grid">
+				<HomeCard
+					href="/dona-estrellas"
+					src="/cards/dona-estrellas.jpg"
+					alt="Donar Estrellas"
+					label="Donar Estrellas — donar"
+				/>
+				<HomeCard
+					href="/tienda"
+					src="/cards/tienda-solidaria.jpg"
+					alt="Visitar Tienda Solidaria"
+					label="Visitar Tienda Solidaria — ver tienda"
+				/>
+			</div>
+		</section>
 	</div>
-	<section class="help" aria-labelledby="help-title">
-		<p class="cards-title help-title" id="help-title">🐾 ¿Cómo puedes ayudar? ⭐</p>
-		<div class="help-grid">
-			<HomeCard
-				href="/dona-estrellas"
-				src="/cards/dona-estrellas.jpg"
-				alt="Donar Estrellas"
-				label="Donar Estrellas — donar"
-			/>
-			<HomeCard
-				href="/tienda"
-				src="/cards/tienda-solidaria.jpg"
-				alt="Visitar Tienda Solidaria"
-				label="Visitar Tienda Solidaria — ver tienda"
-			/>
-		</div>
-	</section>
+	</div>
 	<section class="news" aria-labelledby="news-title">
 		<p class="cards-title" id="news-title">📰 Noticias 📰</p>
 		<div class="news-grid">
@@ -103,20 +101,6 @@
 </main>
 
 <style>
-	.tagline {
-		font-family: var(--font-brand);
-		font-weight: 400;
-		color: #fffdf8;
-		text-align: center;
-		text-wrap: balance;
-		font-size: clamp(1.75rem, 7vw, 2.75rem);
-		line-height: 1.15;
-		margin: 1.5rem 0 1rem;
-		-webkit-text-stroke: 4px #7a3f16;
-		paint-order: stroke fill;
-		text-shadow: 0 6px 20px rgb(122 63 22 / 0.6);
-	}
-
 	.cards-title {
 		font-family: var(--font-brand);
 		font-weight: 400;
@@ -187,6 +171,13 @@
 
 	.help {
 		margin-block: 3rem;
+	}
+
+	/* Columna derecha del hero: los 3 accesos (proyecto, dona, tienda). */
+	.side {
+		display: flex;
+		flex-direction: column;
+		min-width: 0;
 	}
 
 	.help-title {
@@ -282,12 +273,16 @@
 		}
 
 		.cards-title.help-title {
-			display: block;
+			display: none;
+		}
+
+		.help {
+			margin: 0;
 		}
 
 		.help-grid {
 			display: grid;
-			grid-template-columns: 1fr 1fr;
+			grid-template-columns: 1fr;
 			gap: 1.5rem;
 			align-items: center;
 		}
@@ -304,11 +299,14 @@
 			margin-block: 1.5rem 3rem;
 		}
 
+		.side {
+			gap: 1.5rem;
+		}
+
 		.hero {
 			margin: 0;
 			max-width: none;
 			min-height: 100%;
-			grid-row: span 2;
 		}
 	}
 </style>

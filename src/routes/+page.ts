@@ -1,7 +1,8 @@
 import { getNewsPage } from '#lib/api/news';
+import { getFeaturedDogs } from '#lib/api/dogs';
 
-/** Portada: las 4 noticias más recientes. */
+/** Portada: los perritos destacados y las 4 noticias más recientes. */
 export async function load() {
-	const { items } = await getNewsPage(0, 4);
-	return { news: items };
+	const [{ items }, pack] = await Promise.all([getNewsPage(0, 4), getFeaturedDogs()]);
+	return { news: items, pack };
 }

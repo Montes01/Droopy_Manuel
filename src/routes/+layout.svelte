@@ -56,7 +56,7 @@
 	<meta name="robots" content="index, follow" />
 	<link rel="icon" href="/favicon.png" />
 	<link rel="apple-touch-icon" href="/favicon.png" />
-	<link rel="preload" href="/fonts/hello-note.otf" as="font" type="font/otf" crossorigin="anonymous" />
+	<link rel="preload" href="/fonts/hello-note.woff2" as="font" type="font/woff2" crossorigin="anonymous" />
 	<link
 		rel="preload"
 		href="/fonts/architects-daughter-latin.woff2"

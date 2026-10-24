@@ -39,26 +39,47 @@
 </svelte:head>
 
 <main class="container pack-page">
-	<p class="tagline">🐾 Mi manada comunitaria 🐾</p>
+	<h1 class="tagline">Manada</h1>
 	<p class="intro">
-		Estos son algunos de los perritos bajo nuestro cuidado. Cada uno con su historia, sus mañas y
-		muchas ganas de amar.
+		Conoce a cada perrito de nuestra manada: su historia, sus mañas y sus muchas ganas de amar.
 	</p>
-	<div class="view-switch">
-	<button
-		type="button"
-		class="view-single"
-		class:heaven={view === 'heaven'}
-		onclick={() => (view = view === 'alive' ? 'heaven' : 'alive')}
-		aria-live="polite"
-	>
-		{#key view}
-			<span class="view-label">{view === 'alive' ? '🐾 Manada' : 'Mi manada en el cielo 🌈'}</span>
-		{/key}
-		<span class="view-swap" aria-hidden="true">⇄</span>
-	</button>
-	<span class="tap-arrow" aria-hidden="true">⤵</span>
+	<div class="view-switch" role="group" aria-label="Elige qué manada quieres ver">
+		<button
+			type="button"
+			class="view-option"
+			class:active={view === 'alive'}
+			aria-pressed={view === 'alive'}
+			onclick={() => (view = 'alive')}
+		>
+			<span class="option-text">
+				<span class="option-title">Comunitaria</span>
+				<span class="option-count">
+					{data.alive.length}
+					{data.alive.length === 1 ? 'perrito' : 'perritos'}
+				</span>
+			</span>
+		</button>
+		<button
+			type="button"
+			class="view-option"
+			class:active={view === 'heaven'}
+			aria-pressed={view === 'heaven'}
+			onclick={() => (view = 'heaven')}
+		>
+			<span class="option-text">
+				<span class="option-title">En el cielo</span>
+				<span class="option-count">
+					{data.heaven.length}
+					{data.heaven.length === 1 ? 'angelito' : 'angelitos'}
+				</span>
+			</span>
+		</button>
 	</div>
+	<p class="view-hint" aria-live="polite">
+		{view === 'alive'
+			? 'Estos son los perritos que hoy buscan un hogar lleno de amor.'
+			: 'Estos son los perritos que ya no están con nosotros, pero siguen en la manada.'}
+	</p>
 	<div class="pack-grid">
 		{#each pack as dog (dog.slug)}
 			<div class="print" style="transform: rotate({tiltFor(dog.slug)}deg)">
@@ -66,6 +87,13 @@
 			</div>
 		{/each}
 	</div>
+	{#if pack.length === 0}
+		<p class="empty">
+			{view === 'alive'
+				? 'Muy pronto habrá perritos esperando aquí.'
+				: 'Todavía no hay angelitos en el cielo.'}
+		</p>
+	{/if}
 	<DogModal dog={selected} onclose={() => (selected = null)} />
 </main>
 
@@ -80,9 +108,9 @@
 		color: #fffdf8;
 		text-align: center;
 		text-wrap: balance;
-		font-size: clamp(2rem, 8vw, 3rem);
-		line-height: 1.15;
-		margin: 1.5rem 0 0.75rem;
+		font-size: clamp(2.75rem, 11vw, 4.5rem);
+		line-height: 1;
+		margin: 1.25rem 0 0.5rem;
 		-webkit-text-stroke: 4px #7a3f16;
 		paint-order: stroke fill;
 		text-shadow: 0 6px 20px rgb(122 63 22 / 0.6);
@@ -96,122 +124,95 @@
 		margin: 0 auto 1.5rem;
 	}
 
-	.view-single {
+	/* Dos opciones siempre visibles: nada de adivinar qué hace el botón. */
+	.view-switch {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		max-width: 40rem;
+		margin: 0 auto 0.75rem;
+		padding: 0.375rem;
+		border-radius: 1.25rem;
+		border: 2px solid #7a3f16;
+		background: rgb(255 255 255 / 0.85);
+		box-shadow: 0 0.5rem 1.25rem rgb(122 63 22 / 0.25);
+	}
+
+	.view-option {
 		display: flex;
 		align-items: center;
-		justify-content: flex-start;
-		gap: 0.5rem;
+		gap: 0.75rem;
 		width: 100%;
-		min-height: 3.5rem;
-		margin-bottom: 2rem;
-		padding: 0.625rem 1.25rem;
-		border-radius: 999px;
-		border: 2px solid #7a3f16;
-		background: rgb(255 255 255 / 0.8);
-		box-shadow: 0 0.5rem 1.25rem rgb(122 63 22 / 0.25);
+		min-height: var(--tap-min);
+		padding: 0.625rem 0.875rem;
+		border: 0;
+		border-radius: 0.875rem;
+		background: transparent;
+		font: inherit;
+		color: #7a3f16;
+		text-align: left;
+		cursor: pointer;
+		transition:
+			background 0.2s ease,
+			color 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.view-option:hover {
+		background: rgb(122 63 22 / 0.08);
+	}
+
+	.view-option:focus-visible {
+		outline: 3px solid #7a3f16;
+		outline-offset: 2px;
+	}
+
+	/* Activa: rellena, para que no haya duda de dónde estás parado. */
+	.view-option.active {
+		background: #7a3f16;
+		color: #fffdf8;
+		box-shadow: 0 0.25rem 0.75rem rgb(122 63 22 / 0.35);
+	}
+
+	.view-option.active .option-count {
+		color: rgb(255 253 248 / 0.85);
+	}
+
+	.option-emoji {
+		font-size: 1.75rem;
+		line-height: 1;
+	}
+
+	.option-text {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+	}
+
+	.option-title {
 		font-family: var(--font-brand);
 		font-size: 1.375rem;
-		color: inherit;
-		cursor: pointer;
-		animation: view-nudge 0.9s ease 0.6s;
+		line-height: 1.1;
 	}
 
-	.view-single.heaven {
-		justify-content: flex-end;
+	.option-count {
+		font-size: 0.875rem;
+		opacity: 0.85;
 	}
 
-	.view-swap {
-		margin-left: auto;
-		font-size: 1.5rem;
-		color: #7a3f16;
-		animation: swap-wiggle 1.6s ease-in-out 0.6s 3;
+	.view-hint {
+		max-width: 40rem;
+		margin: 0 auto 2rem;
+		text-align: center;
+		text-wrap: pretty;
+		opacity: 0.85;
 	}
 
-	.view-single.heaven .view-swap {
-		margin-left: 0;
-		margin-right: auto;
-		order: -1;
-	}
-
-	@keyframes view-nudge {
-		0%,
-		100% {
-			transform: translateX(0);
-		}
-		25% {
-			transform: translateX(0.375rem);
-		}
-		75% {
-			transform: translateX(-0.375rem);
-		}
-	}
-
-	@keyframes swap-wiggle {
-		0%,
-		100% {
-			transform: rotate(0);
-		}
-		25% {
-			transform: rotate(-20deg) scale(1.15);
-		}
-		75% {
-			transform: rotate(20deg) scale(1.15);
-		}
-	}
-
-	.view-label {
-		display: inline-block;
-		animation: view-in-left 0.25s ease;
-	}
-
-	.view-single.heaven .view-label {
-		animation-name: view-in-right;
-	}
-
-	@keyframes view-in-left {
-		from {
-			opacity: 0;
-			transform: translateX(-1rem);
-		}
-	}
-
-	@keyframes view-in-right {
-		from {
-			opacity: 0;
-			transform: translateX(1rem);
-		}
-	}
-
-	.view-switch {
-		position: relative;
-		margin-bottom: 2.5rem;
-	}
-
-	.view-switch .view-single {
-		margin-bottom: 0;
-	}
-
-	.tap-arrow {
-		position: absolute;
-		right: 0.75rem;
-		bottom: -1.75rem;
-		z-index: 5;
-		pointer-events: none;
-		font-size: 2.5rem;
-		line-height: 1;
-		color: #7a3f16;
-		filter: drop-shadow(0 3px 0 rgb(255 253 248)) drop-shadow(0 6px 12px rgb(122 63 22 / 0.45));
-		animation: tap-arrow-rise 1.4s ease-in-out infinite;
-	}
-
-	@keyframes tap-arrow-rise {
-		0%,
-		100% {
-			transform: rotate(172deg) translateY(0.25rem);
-		}
-		50% {
-			transform: rotate(172deg) translateY(-0.25rem);
-		}
+	.empty {
+		padding: 2rem 1rem;
+		text-align: center;
+		font-size: 1.125rem;
+		opacity: 0.8;
 	}
 
 	.pack-grid {
@@ -226,10 +227,15 @@
 		will-change: transform;
 	}
 
-	@media (min-width: 48rem) {
+	@media (min-width: 40rem) {
 		.view-switch {
-			max-width: 40rem;
-			margin-inline: auto;
+			flex-direction: row;
+		}
+
+		.view-option {
+			flex: 1 1 0;
+			justify-content: center;
+			text-align: center;
 		}
 	}
 

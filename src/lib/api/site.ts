@@ -2,6 +2,7 @@ import type {
 	BankAccount,
 	DonationTarget,
 	DonationTier,
+	SiteAnnouncement,
 	SiteContact,
 	SiteContent,
 	SiteStats,
@@ -13,6 +14,11 @@ import { api } from './client';
 
 export async function getSiteContent(): Promise<SiteContent> {
 	return api.get<SiteContent>('/api/site/content');
+}
+
+/** El anuncio de la portada: activado + los últimos perritos en adopción. */
+export async function getSiteAnnouncement(): Promise<SiteAnnouncement> {
+	return api.get<SiteAnnouncement>('/api/site/announcement');
 }
 
 /** WhatsApp, correo y redes. Fuente única del número de contacto. */

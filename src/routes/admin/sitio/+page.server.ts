@@ -6,6 +6,7 @@ import type {
 	ContactChannel,
 	Dog,
 	DonationTier,
+	SiteAnnouncement,
 	SiteContact,
 	SiteContent,
 	Testimonial
@@ -29,7 +30,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
 		}
 	}
 
-	const [content, contact, tiers, testimonials, accounts, dogs] = await Promise.all([
+	const [content, contact, announcement, tiers, testimonials, accounts, dogs] = await Promise.all([
 		safe(() => serverApi.get<SiteContent>('/api/site/content', cookies), {
 			aboutBlurb: '',
 			stats: { rescued: 0, adopted: 0, sterilized: 0, inCare: 0 }
@@ -41,13 +42,20 @@ export const load: PageServerLoad = async ({ cookies }) => {
 			email: '',
 			socials: [] as ContactChannel[]
 		}),
+		safe(() => serverApi.get<SiteAnnouncement>('/api/site/announcement', cookies), {
+			enabled: false,
+			dogsCount: 4,
+			title: 'Buscando hogar',
+			message: 'Estos perritos están esperando una familia.',
+			dogs: []
+		}),
 		safe(() => serverApi.get<DonationTier[]>('/api/site/donation-tiers', cookies), []),
 		safe(() => serverApi.get<Testimonial[]>('/api/site/testimonials', cookies), []),
 		safe(() => serverApi.get<BankAccount[]>('/api/site/bank-accounts', cookies), []),
 		safe(() => serverApi.get<Dog[]>('/api/dogs', cookies), [])
 	]);
 
-	return { content, contact, tiers, testimonials, accounts, dogs };
+	return { content, contact, announcement, tiers, testimonials, accounts, dogs };
 };
 
 function text(value: FormDataEntryValue | null): string | undefined {
@@ -124,6 +132,36 @@ export const actions: Actions = {
 			return { success: true, message: 'Estadísticas actualizadas.' };
 		} catch (error) {
 			return fail(400, { error: actionError(error, 'No se pudieron guardar las estadísticas.') });
+		}
+	},
+
+	/** Guarda el anuncio de inicio: activado, cuántos perros y su texto. */
+	saveAnnouncement: async ({ request, cookies }) => {
+		const form = await request.formData();
+
+		// El checkbox solo viaja cuando está marcado.
+		const enabled = form.get('enabled') === 'on';
+		const dogsCount = toInt(form.get('dogsCount'));
+
+		if (dogsCount === undefined) {
+			return fail(400, { error: 'Escribe cuántos perritos mostrar.' });
+		}
+		if (dogsCount < 1 || dogsCount > 12) {
+			return fail(400, { error: 'El número de perritos debe estar entre 1 y 12.' });
+		}
+
+		const value = {
+			enabled,
+			dogsCount,
+			title: text(form.get('title')) ?? '',
+			message: text(form.get('message')) ?? ''
+		};
+
+		try {
+			await serverApi.put('/api/admin/site/settings/announcement', cookies, { value });
+			return { success: true, message: 'Anuncio actualizado.' };
+		} catch (error) {
+			return fail(400, { error: actionError(error, 'No se pudo guardar el anuncio.') });
 		}
 	},
 

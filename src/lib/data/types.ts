@@ -443,6 +443,27 @@ export interface SiteContent {
 	stats: SiteStats;
 }
 
+/**
+ * Configuración del anuncio de inicio. Copia de `Server/src/types.ts`.
+ *
+ * `dogsCount` es cuántos perritos en adopción muestra el pop-up; se edita
+ * desde el panel.
+ */
+export interface AnnouncementSettings {
+	enabled: boolean;
+	dogsCount: number;
+	title: string;
+	message: string;
+}
+
+/**
+ * El anuncio de la portada ya resuelto por el backend: configuración + los
+ * últimos perritos en adopción. `dogs` viene vacío si está desactivado.
+ */
+export interface SiteAnnouncement extends AnnouncementSettings {
+	dogs: Dog[];
+}
+
 /** Una red social o canal de contacto, con su icono. */
 export interface ContactChannel {
 	/** Identificador: whatsapp, instagram… */

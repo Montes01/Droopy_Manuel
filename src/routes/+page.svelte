@@ -1,6 +1,7 @@
 <script lang="ts">
 	import HomeCard from '#lib/components/HomeCard.svelte';
 	import DogCarousel from '#lib/components/DogCarousel.svelte';
+	import AnnouncementPopup from '#lib/components/AnnouncementPopup.svelte';
 	import { site, pageTitle } from '#lib/site';
 	import type { Dog, NewsItem } from '#lib/data/types';
 
@@ -24,6 +25,8 @@
 	<meta name="twitter:title" content={title} />
 	<meta name="twitter:description" content={site.description} />
 </svelte:head>
+
+<AnnouncementPopup announcement={data.announcement} />
 
 <main class="container">
 	<DogCarousel dogs={pack} href="/manada" />

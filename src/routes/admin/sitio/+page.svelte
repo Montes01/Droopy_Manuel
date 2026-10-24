@@ -177,6 +177,51 @@
 	</datalist>
 </section>
 
+<!-- ------------------------------------------------------- Anuncio de inicio -->
+<section class="card">
+	<h2>Anuncio de inicio</h2>
+	<p class="hint">
+		El pop-up que aparece al entrar a la portada, con los últimos perritos en adopción.
+		Se muestra una vez por día a cada visitante.
+	</p>
+
+	<form method="POST" action="?/saveAnnouncement" use:enhance>
+		<label class="check">
+			<input type="checkbox" name="enabled" checked={data.announcement.enabled} />
+			Mostrar el anuncio al entrar a la portada
+		</label>
+
+		<div class="grid">
+			<label>
+				Perritos a mostrar *
+				<input
+					name="dogsCount"
+					type="number"
+					min="1"
+					max="12"
+					value={data.announcement.dogsCount}
+					required
+				/>
+			</label>
+			<label>
+				Título *
+				<input name="title" value={data.announcement.title} maxlength="120" required />
+			</label>
+			<label class="wide">
+				Mensaje (opcional)
+				<textarea name="message" rows="2" maxlength="300">{data.announcement.message}</textarea>
+			</label>
+		</div>
+
+		<p class="hint">
+			Se mostrarán los últimos <strong>{data.announcement.dogsCount}</strong> perritos con
+			estado «En adopción», del más reciente al más antiguo.
+		</p>
+
+		<button class="primary" type="submit">Guardar anuncio</button>
+	</form>
+</section>
+
 <!-- --------------------------------------------------------- Sobre nosotros -->
 <section class="card">
 	<h2>Sobre nosotros</h2>
@@ -573,6 +618,18 @@
 
 	label.wide {
 		grid-column: 1 / -1;
+	}
+
+	label.check {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.75rem;
+		cursor: pointer;
+	}
+
+	label.check input {
+		width: auto;
 	}
 
 	input,

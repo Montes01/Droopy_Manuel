@@ -22,7 +22,8 @@
 			</a>
 		{/each}
 	</div>
-	<p class="footer-note">© {new Date().getFullYear()} {site.name} · Hecho con amor y croquetas 🐾</p>
+	<p class="footer-note">Droopy envía estrellas y regalos para iluminar vidas de 4 patas</p>
+	<p class="footer-legal">© {new Date().getFullYear()} {site.name}</p>
 </footer>
 
 <style>
@@ -72,9 +73,19 @@
 	}
 
 	.footer-note {
-		margin-top: 1.5rem;
-		font-size: 1rem;
-		opacity: 0.85;
+		max-width: 32rem;
+		margin: 1.5rem auto 0;
+		font-family: var(--font-brand);
+		font-size: 1.125rem;
+		line-height: 1.35;
+		text-wrap: balance;
+		opacity: 0.95;
+	}
+
+	.footer-legal {
+		margin-top: 0.5rem;
+		font-size: 0.8125rem;
+		opacity: 0.7;
 	}
 
 	@media (hover: hover) {

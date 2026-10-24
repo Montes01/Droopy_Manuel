@@ -57,6 +57,8 @@
 }
 
 html {
+	/* Base 18px (antes 16px): todo el sitio usa rem, así que escala completo. */
+	font-size: 112.5%;
 	-webkit-text-size-adjust: 100%;
 	text-size-adjust: 100%;
 	scroll-behavior: smooth;
